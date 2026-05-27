@@ -148,7 +148,7 @@
     </div>
   </header>
 
-  <!-- Banners de Sincronización -->
+  <!-- Banners de Sincronización Dinámicos -->
   <div id="cloud-status-banner" class="bg-amber-500/10 border-b border-amber-500/20 text-center py-1.5 text-xs text-amber-300 font-bold hidden">
     ⚠️ Jugando sin conexión (Modo Local). Tus amigos no verán tu progreso. 
     <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-1 hover:text-yellow-300 font-black font-semibold">¿Cómo jugar con amigos?</button>
@@ -486,11 +486,11 @@
     // --- INTEGRACIÓN FIREBASE (SOPORTE DE NUBE PARA AMIGOS) ---
     const customFirebaseConfig = {
       apiKey: "AIzaSyBdJKrX2JCGgvCPAxrtnYGADeU2f3ifYdU",
-  authDomain: "tenses-album.firebaseapp.com",
-  projectId: "tenses-album",
-  storageBucket: "tenses-album.firebasestorage.app",
-  messagingSenderId: "330006805562",
-  appId: "1:330006805562:web:a4230111f7a4fea69b8903"
+      authDomain: "tenses-album.firebaseapp.com",
+      projectId: "tenses-album",
+      storageBucket: "tenses-album.firebasestorage.app",
+      messagingSenderId: "330006805562",
+      appId: "1:330006805562:web:a4230111f7a4fea69b8903"
     };
 
     // Firebase Module Imports
@@ -502,6 +502,31 @@
     let auth = null;
     let isCloudEnabled = false;
     let currentAuthUser = null;
+
+    // Actualiza dinámicamente el mensaje del banner amarillo con información de depuración
+    function showCloudError(message, isTechnical = false) {
+      const banner = document.getElementById('cloud-status-banner');
+      const successBanner = document.getElementById('cloud-success-banner');
+      
+      successBanner.classList.add('hidden');
+      banner.classList.remove('hidden');
+      
+      if (isTechnical) {
+        banner.innerHTML = `
+          <div class="px-4 py-1.5 leading-normal text-left text-xs bg-red-950/90 border-b border-red-500/50 text-red-200">
+            <span class="font-black text-red-400">🚨 ERROR FIREBASE:</span> ${message}
+            <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-2 hover:text-yellow-300 font-black">¿Cómo solucionarlo?</button>
+          </div>
+        `;
+      } else {
+        banner.innerHTML = `
+          <div class="px-4 py-1.5">
+            ⚠️ Jugando sin conexión (Modo Local). Tus amigos no verán tu progreso.
+            <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-1 hover:text-yellow-300 font-black">¿Cómo jugar con amigos?</button>
+          </div>
+        `;
+      }
+    }
 
     // Inicializar Firebase
     function initFirebase() {
@@ -520,13 +545,15 @@
           auth = getAuth(app);
           db = getFirestore(app);
           isCloudEnabled = true;
-          document.getElementById('cloud-success-banner').classList.remove('hidden');
-          document.getElementById('cloud-status-banner').classList.add('hidden');
           
           signInAnonymously(auth).then(() => {
             onAuthStateChanged(auth, (user) => {
               currentAuthUser = user;
               if (user) {
+                // Conexión exitosa, ocultar banner amarillo, mostrar banner verde
+                document.getElementById('cloud-success-banner').classList.remove('hidden');
+                document.getElementById('cloud-status-banner').classList.add('hidden');
+                
                 const activeName = localStorage.getItem('tense_cup_2026_active_profile');
                 if (activeName) {
                   loadProfileData(activeName);
@@ -534,12 +561,23 @@
               }
             });
           }).catch(err => {
-            console.warn("Fallo en auth anónimo:", err);
+            console.error("Fallo de Autenticación Firebase:", err);
             isCloudEnabled = false;
+            
+            let errMsg = "No se pudo iniciar sesión en el servidor.";
+            if (err.code === "auth/operation-not-allowed") {
+              errMsg = "Debés activar el proveedor 'Anónimo' (Anonymous) en la pestaña Authentication -> Sign-in Method de tu Consola Firebase.";
+            } else if (err.code === "auth/unauthorized-domain") {
+              errMsg = "Tu dominio actual de Vercel no está en la lista de 'Dominios autorizados' en Firebase Authentication -> Configuración.";
+            } else {
+              errMsg = `Fallo de conexión: ${err.message}`;
+            }
+            showCloudError(errMsg, true);
             fallbackToLocalMode();
           });
         } catch (e) {
-          console.warn("Fallo inicializando Firebase.", e);
+          console.error("Fallo inicializando SDK de Firebase:", e);
+          showCloudError(`Error de configuración en tu archivo HTML: ${e.message}`, true);
           fallbackToLocalMode();
         }
       } else {
@@ -549,8 +587,11 @@
 
     function fallbackToLocalMode() {
       isCloudEnabled = false;
-      document.getElementById('cloud-status-banner').classList.remove('hidden');
-      document.getElementById('cloud-success-banner').classList.add('hidden');
+      // Si no hay un mensaje de error técnico ya puesto, mostrar el banner local por defecto
+      const banner = document.getElementById('cloud-status-banner');
+      if (!banner.innerHTML.includes("🚨 ERROR")) {
+        showCloudError();
+      }
       
       const activeName = localStorage.getItem('tense_cup_2026_active_profile');
       if (activeName) {
@@ -561,7 +602,6 @@
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'tense-cup-2026';
 
     // --- BASE DE DATOS DE 50 JUGADORES DEL MUNDIAL 2026 ---
-    // Actualizado con URLs directas de alta calidad de Wikimedia Commons para los cracks y leyendas.
     const PLAYERS = [
       // CATEGORÍA: ARGENTINA (1-15)
       { id: 1, name: "Lionel Messi", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 96, stats: [90, 97, 95, 96, 40, 68], hair: "marrón corto", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/220px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg" },
@@ -753,13 +793,40 @@
             localStorage.setItem('tense_cup_2026_active_profile', nickId);
             enterGame();
           } else {
-            showAlert(`El perfil "${inputName}" no se encontró en la nube. ¡Crealo en la pestaña de al lado!`, "❓");
-            setLoginLoading(false);
+            // Verificar si existe en local para migrarlo
+            const savedLocal = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+            if (savedLocal) {
+              gameState = JSON.parse(savedLocal);
+              activeNickname = gameState.nickname;
+              try {
+                await setDoc(docRef, gameState);
+                localStorage.setItem('tense_cup_2026_active_profile', nickId);
+                enterGame();
+                showAlert(`¡Sincronizamos tu perfil local "${gameState.nickname}" en la nube! 🚀`, "☁️");
+              } catch(errUpload) {
+                console.warn("Fallo subiendo perfil local a la nube:", errUpload);
+                localStorage.setItem('tense_cup_2026_active_profile', nickId);
+                enterGame();
+                showCloudError("Reglas de seguridad Firestore denegadas. Se guardará localmente.", true);
+              }
+            } else {
+              showAlert(`El perfil "${inputName}" no se encontró en la nube ni local. ¡Crealo en la pestaña de al lado!`, "❓");
+              setLoginLoading(false);
+            }
           }
         } catch (e) {
-          console.error(e);
-          showAlert("Hubo un error de conexión con los vestuarios de la nube.", "❌");
-          setLoginLoading(false);
+          console.error("Error al ingresar:", e);
+          const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+          if (savedData) {
+            activeNickname = nickId;
+            gameState = JSON.parse(savedData);
+            localStorage.setItem('tense_cup_2026_active_profile', nickId);
+            enterGame();
+            showCloudError("Error de conexión cloud, cargamos tu respaldo local.", true);
+          } else {
+            showAlert("Hubo un error de conexión con la nube y no tenés respaldo local.", "❌");
+            setLoginLoading(false);
+          }
         }
       } else {
         const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
@@ -815,16 +882,29 @@
             return;
           }
 
+          // Guardar en la nube
           await setDoc(docRef, initialProgress);
           
           activeNickname = inputName;
           gameState = initialProgress;
           localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
           enterGame();
         } catch (e) {
-          console.error(e);
-          showAlert("Error al guardar perfil nuevo en la nube.", "❌");
-          setLoginLoading(false);
+          console.error("Error al registrar:", e);
+          
+          // Registrar localmente como respaldo
+          localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
+          activeNickname = inputName;
+          gameState = initialProgress;
+          localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          enterGame();
+          
+          let errMsg = "No se pudo crear en la nube. Se guardará localmente.";
+          if (e.code === "permission-denied" || e.message.includes("permission")) {
+            errMsg = "Firestore Database denegó el registro. Activá el modo de prueba (lectura/escritura) en tu Consola Firebase.";
+          }
+          showCloudError(errMsg, true);
         }
       } else {
         const existingLocal = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
@@ -867,15 +947,50 @@
         try {
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
           const docSnap = await getDoc(docRef);
+          
           if (docSnap.exists()) {
             gameState = docSnap.data();
             activeNickname = gameState.nickname;
             enterGame();
+            
+            // Forzar banners correctos
+            document.getElementById('cloud-success-banner').classList.remove('hidden');
+            document.getElementById('cloud-status-banner').classList.add('hidden');
           } else {
-            fallbackToLocalMode();
+            // No existe en la nube. Busquemos si hay un progreso local para migrarlo
+            const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+            if (savedData) {
+              gameState = JSON.parse(savedData);
+              activeNickname = gameState.nickname;
+              await setDoc(docRef, gameState);
+              enterGame();
+              showAlert(`¡Sincronizamos tu progreso local "${gameState.nickname}" en la nube! 🚀`, "☁️");
+              document.getElementById('cloud-success-banner').classList.remove('hidden');
+              document.getElementById('cloud-status-banner').classList.add('hidden');
+            } else {
+              logoutProfileSilently();
+            }
           }
         } catch(e) {
-          fallbackToLocalMode();
+          console.error("Error cargando desde Firestore:", e);
+          
+          let errMsg = "No se pudo leer de la base de datos Firestore.";
+          if (e.code === "permission-denied" || e.message.includes("permission")) {
+            errMsg = "Reglas de Firestore bloqueadas. Activá el 'modo de prueba' (permitir lectura/escritura) en tu Consola Firebase -> Firestore Database -> Reglas.";
+          } else {
+            errMsg = `Error de lectura Firestore: ${e.message}`;
+          }
+          showCloudError(errMsg, true);
+          
+          // Respaldo local
+          const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+          if (savedData) {
+            gameState = JSON.parse(savedData);
+            activeNickname = gameState.nickname;
+            enterGame();
+          } else {
+            logoutProfileSilently();
+          }
         }
       } else {
         const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
@@ -883,8 +998,27 @@
           gameState = JSON.parse(savedData);
           activeNickname = gameState.nickname;
           enterGame();
+        } else {
+          logoutProfileSilently();
         }
+        showCloudError(); 
       }
+    }
+
+    function logoutProfileSilently() {
+      localStorage.removeItem('tense_cup_2026_active_profile');
+      activeNickname = "";
+      document.getElementById('user-badge').classList.add('hidden');
+      document.getElementById('user-badge').classList.remove('flex');
+      document.getElementById('main-navigation').classList.add('hidden');
+      document.getElementById('view-train').classList.add('hidden');
+      document.getElementById('view-album').classList.add('hidden');
+      document.getElementById('view-shop').classList.add('hidden');
+      document.getElementById('view-friends').classList.add('hidden');
+      document.getElementById('day-panel').classList.add('hidden');
+      setLoginLoading(false);
+      document.getElementById('view-login').classList.remove('hidden');
+      switchLoginTab('signin');
     }
 
     function enterGame() {
