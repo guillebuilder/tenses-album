@@ -41,20 +41,37 @@
     }
   </style>
 </head>
-<body class="min-h-screen overflow-x-hidden flex flex-col">
+<body class="min-h-screen overflow-x-hidden flex flex-col relative">
+
+  <!-- ==================== PANTALLA DE CARGA DEL VESTUARIO ==================== -->
+  <div id="app-launcher-screen" class="fixed inset-0 bg-zinc-950 z-50 flex flex-col items-center justify-center p-6 text-center">
+    <div class="bg-emerald-950/40 border border-emerald-500/30 p-8 rounded-3xl max-w-sm w-full space-y-6 shadow-2xl relative overflow-hidden">
+      <!-- Brillo celeste y blanco de fondo decorativo -->
+      <div class="absolute -top-10 -right-10 w-24 h-24 bg-sky-500/10 rounded-full blur-xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
+      
+      <div class="text-6xl animate-bounce">⚽</div>
+      <div class="space-y-2">
+        <h2 class="text-2xl font-black italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-yellow-400 leading-tight uppercase">TENSE CUP 2026</h2>
+        <p class="text-xs text-emerald-400 font-extrabold uppercase tracking-widest">Preparando el potrero...</p>
+      </div>
+      <p class="text-[11px] text-gray-400 leading-relaxed">Estamos armando las tribunas, inflando las pelotas de fútbol y cargando las figuritas en el kiosco virtual.</p>
+      
+      <div class="pt-4">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-emerald-500 rounded-full"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Sonidos Sintetizados (Web Audio API) -->
   <script>
     let audioCtx = null;
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch(e) {
-      console.warn("Web Audio API no soportada en este entorno sandbox.");
-    }
     
     function playSound(type) {
-      if (!audioCtx) return;
       try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
         if (audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
@@ -115,8 +132,8 @@
           gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
           noise.start();
         }
-      } catch(e) {
-        console.warn("No se pudo reproducir audio:", e);
+      } catch (e) {
+        console.warn("Fallo de audio simulado en tu navegador:", e);
       }
     }
   </script>
@@ -469,7 +486,7 @@
       </ol>
 
       <div class="pt-2 text-right">
-        <button onclick="closeCloudConfigModal()" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-xl">
+        <button id="btn-close-cloud-config" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-xl">
           ¡ENTENDIDO, CRACK!
         </button>
       </div>
@@ -513,11 +530,21 @@
     let isCloudEnabled = false;
     let currentAuthUser = null;
 
+    // Helper robusto para guardar en LocalStorage sin crashear en navegación privada/cookies bloqueadas
+    function safeGetItem(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetItem(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) {}
+    }
+    function safeRemoveItem(key) {
+      try { localStorage.removeItem(key); } catch (e) {}
+    }
+
     // Actualiza dinámicamente el mensaje del banner amarillo con información de depuración
     function showCloudError(message, isTechnical = false) {
       const banner = document.getElementById('cloud-status-banner');
       const successBanner = document.getElementById('cloud-success-banner');
-      if (!banner || !successBanner) return;
       
       successBanner.classList.add('hidden');
       banner.classList.remove('hidden');
@@ -526,30 +553,38 @@
         banner.innerHTML = `
           <div class="px-4 py-1.5 leading-normal text-left text-xs bg-red-950/90 border-b border-red-500/50 text-red-200">
             <span class="font-black text-red-400">🚨 ERROR FIREBASE:</span> ${message}
-            <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-2 hover:text-yellow-300 font-black">¿Cómo solucionarlo?</button>
+            <button id="btn-banner-cloud-helper" class="underline text-yellow-400 ml-2 hover:text-yellow-300 font-black">¿Cómo solucionarlo?</button>
           </div>
         `;
+        const btnHelper = document.getElementById('btn-banner-cloud-helper');
+        if (btnHelper) btnHelper.onclick = openCloudConfigModal;
       } else {
         banner.innerHTML = `
           <div class="px-4 py-1.5">
             ⚠️ Jugando sin conexión (Modo Local). Tus amigos no verán tu progreso.
-            <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-1 hover:text-yellow-300 font-black">¿Cómo jugar con amigos?</button>
+            <button id="btn-banner-cloud-helper-local" class="underline text-yellow-400 ml-1 hover:text-yellow-300 font-black">¿Cómo jugar con amigos?</button>
           </div>
         `;
+        const btnHelperLocal = document.getElementById('btn-banner-cloud-helper-local');
+        if (btnHelperLocal) btnHelperLocal.onclick = openCloudConfigModal;
       }
     }
 
-    // Inicializar Firebase
-    function initFirebase() {
+    // Evita bloqueos indefinidos si Firestore tarda demasiado o la conexión es inestable
+    function withTimeout(promise, ms = 4000) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("La jugada tardó mucho (Tiempo límite de nube excedido).")), ms))
+      ]);
+    }
+
+    // Inicializar Firebase de forma ultra segura
+    async function initFirebase() {
       let finalConfig = null;
-      try {
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-          finalConfig = JSON.parse(__firebase_config);
-        } else if (customFirebaseConfig.apiKey) {
-          finalConfig = customFirebaseConfig;
-        }
-      } catch (errJson) {
-        console.warn("Fallo de parsing __firebase_config:", errJson);
+      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try { finalConfig = JSON.parse(__firebase_config); } catch(e) {}
+      } else if (customFirebaseConfig.apiKey) {
+        finalConfig = customFirebaseConfig;
       }
 
       if (finalConfig) {
@@ -559,62 +594,55 @@
           db = getFirestore(app);
           isCloudEnabled = true;
           
-          signInAnonymously(auth).then(() => {
-            onAuthStateChanged(auth, (user) => {
-              currentAuthUser = user;
-              if (user) {
-                // Conexión exitosa, ocultar banner amarillo, mostrar banner verde
-                const successB = document.getElementById('cloud-success-banner');
-                const statusB = document.getElementById('cloud-status-banner');
-                if (successB) successB.classList.remove('hidden');
-                if (statusB) statusB.classList.add('hidden');
-                
-                let activeName = null;
-                try {
-                  activeName = localStorage.getItem('tense_cup_2026_active_profile');
-                } catch(e) {}
-                if (activeName) {
-                  loadProfileData(activeName);
-                }
+          await withTimeout(signInAnonymously(auth), 4000);
+          
+          onAuthStateChanged(auth, (user) => {
+            currentAuthUser = user;
+            if (user) {
+              document.getElementById('cloud-success-banner').classList.remove('hidden');
+              document.getElementById('cloud-status-banner').classList.add('hidden');
+              
+              const activeName = safeGetItem('tense_cup_2026_active_profile');
+              if (activeName) {
+                loadProfileData(activeName);
               }
-            });
-          }).catch(err => {
-            console.error("Fallo de Autenticación Firebase:", err);
-            isCloudEnabled = false;
-            
-            let errMsg = "No se pudo iniciar sesión en el servidor.";
-            if (err.code === "auth/operation-not-allowed") {
-              errMsg = "Debés activar el proveedor 'Anónimo' (Anonymous) en la pestaña Authentication -> Sign-in Method de tu Consola Firebase.";
-            } else if (err.code === "auth/unauthorized-domain") {
-              errMsg = "Tu dominio actual de Vercel no está en la lista de 'Dominios autorizados' en Firebase Authentication -> Configuración.";
-            } else {
-              errMsg = `Fallo de conexión: ${err.message}`;
             }
-            showCloudError(errMsg, true);
-            fallbackToLocalMode();
           });
-        } catch (e) {
-          console.error("Fallo inicializando SDK de Firebase:", e);
-          showCloudError(`Error de configuración en tu archivo HTML: ${e.message}`, true);
+        } catch (err) {
+          console.warn("Fallo de conexión a Firebase, operando en Modo Local:", err);
+          isCloudEnabled = false;
+          
+          let errMsg = "No pudimos conectar con los servidores del potrero.";
+          if (err.code === "auth/operation-not-allowed") {
+            errMsg = "Debés activar el proveedor de ingreso 'Anónimo' (Anonymous) en tu Consola Firebase -> Authentication -> Sign-in Method.";
+          } else if (err.code === "auth/unauthorized-domain") {
+            errMsg = "El dominio de Vercel no está en la lista de Dominios Autorizados de Firebase.";
+          } else if (err.message && err.message.includes("Tiempo")) {
+            errMsg = "La conexión con Firebase tarda mucho. Te pusimos en Modo Local para que no dejes de jugar.";
+          }
+          showCloudError(errMsg, true);
           fallbackToLocalMode();
         }
       } else {
         fallbackToLocalMode();
       }
+
+      // IMPORTANTE: Retirar pantalla de carga una vez finalizada la inicialización
+      const launcher = document.getElementById('app-launcher-screen');
+      if (launcher) {
+        launcher.classList.add('transition-opacity', 'duration-500', 'opacity-0');
+        setTimeout(() => launcher.remove(), 500);
+      }
     }
 
     function fallbackToLocalMode() {
       isCloudEnabled = false;
-      // Si no hay un mensaje de error técnico ya puesto, mostrar el banner local por defecto
       const banner = document.getElementById('cloud-status-banner');
-      if (banner && !banner.innerHTML.includes("🚨 ERROR")) {
+      if (!banner.innerHTML.includes("🚨 ERROR")) {
         showCloudError();
       }
       
-      let activeName = null;
-      try {
-        activeName = localStorage.getItem('tense_cup_2026_active_profile');
-      } catch(e) {}
+      const activeName = safeGetItem('tense_cup_2026_active_profile');
       if (activeName) {
         loadProfileData(activeName);
       }
@@ -692,6 +720,140 @@
       { id: "cuti", emoji: "🛡️", name: "Cuti", role: "El Caimán", code: "CUT", jersey: "13" }
     ];
     let selectedAvatarIndex = 0;
+
+    // --- PLAN DE ESTUDIO / DESAFÍOS DE 10 DÍAS ---
+    const DAYS_DATA = {
+      1: {
+        title: "Día 1: Present Simple vs. Present Continuous",
+        desc: "¡Empezamos la pretemporada en el potrero! Usamos el <strong>Present Simple</strong> para rutinas y cosas que siempre pasan en la cancha (ej. <em>Messi plays football every day</em>). Usamos el <strong>Present Continuous</strong> para lo que está pasando en este preciso momento (ej. <em>Look! Julián is shooting the ball now</em>).",
+        tip: "⚠️ Ojo al dato: Palabras clave como 'always, usually, every day' llaman al Simple. Mientras que 'now, at the moment, look!' mandan al Continuous de cabeza.",
+        reward: 100,
+        questions: [
+          { q: "Messi usually _________ (train) in Miami, but today he is playing a match in Argentina.", options: ["trains", "is training", "train", "trained"], correct: 0, reason: "Usamos 'trains' (Present Simple) porque 'usually' indica una rutina o hábito del diez." },
+          { q: "Look! Scaloni _________ (talk) to the referee right now.", options: ["talks", "is talking", "talked", "is talk"], correct: 1, reason: "La jugada dice 'Look!' y 'right now'. Está pasando en vivo, requiere Present Continuous." },
+          { q: "The Argentine fans always _________ (sing) during the matches.", options: ["singing", "are singing", "sing", "sings"], correct: 2, reason: "'Always' indica costumbre popular de la tribuna, y como 'fans' es plural, va 'sing'." },
+          { q: "At the moment, Mbappe _________ (recover) from a muscle injury.", options: ["is recovering", "recovers", "recovering", "recover"], correct: 0, reason: "'At the moment' (en este momento) te pide que pongas Present Continuous." },
+          { q: "We _________ (watch) World Cup videos every single evening.", options: ["are watching", "watches", "watch", "watched"], correct: 2, reason: "'Every evening' marca rutina hogareña, va en Present Simple para el grupo 'We'." }
+        ]
+      },
+      2: {
+        title: "Día 2: Past Simple vs. Past Continuous",
+        desc: "¡Primer amistoso duro! El <strong>Past Simple</strong> describe jugadas terminadas en el pasado (ej. <em>We won the cup in 2022</em>). El <strong>Past Continuous</strong> describe acciones largas que se estaban jugando en el pasado cuando algo las cortó (ej. <em>I was watching the match when the lights went out</em>).",
+        tip: "💡 Truco del DT: Usamos 'while' seguido de Past Continuous (was/were + -ing) y 'when' para la patada que frena todo en Past Simple.",
+        reward: 100,
+        questions: [
+          { q: "While Dibu Martínez _________ (jump) to save the ball, he hurt his leg.", options: ["jumped", "was jumping", "were jumping", "is jumping"], correct: 1, reason: "La palabra 'While' (mientras) te pide una acción en progreso en el pasado." },
+          { q: "Argentina _________ (win) the World Cup in Qatar four years ago.", options: ["win", "winned", "was winning", "won"], correct: 3, reason: "'Four years ago' es un tiempo específico y terminado. Usamos el glorioso pasado simple 'won'." },
+          { q: "When the referee blew the whistle, the players _________ (celebrate) on the pitch.", options: ["were celebrating", "was celebrating", "celebrated", "celebrate"], correct: 0, reason: "Estaban celebrando (acción larga) cuando el réferi tocó el silbato de golpe." },
+          { q: "Messi _________ (score) an amazing free-kick last night.", options: ["was scoring", "scores", "scored", "is scoring"], correct: 2, reason: "'Last night' cerró el partido de anoche, va en Past Simple: 'scored'." },
+          { q: "What _________ you _________ (do) when Mac Allister scored the goal?", options: ["were/doing", "was/doing", "did/do", "are/doing"], correct: 0, reason: "Pregunta sobre qué acción estabas jugando en el pasado en el momento exacto del golazo." }
+        ]
+      },
+      3: {
+        title: "Día 3: Present Perfect vs. Past Simple",
+        desc: "¡Fase de grupos picante! El <strong>Present Perfect</strong> (have/has + participle) se usa para tus copas ganadas o experiencias de vida (ej. <em>I have met Messi twice</em>) sin decir cuándo. El <strong>Past Simple</strong> va si das la fecha exacta del partido (ej. <em>I met him in 2024</em>).",
+        tip: "⚡ Clave de vestuario: Si la oración dice 'yesterday, in 2022, last year', clavas Past Simple. Si dice 'ever, never, already, yet', vas con Present Perfect.",
+        reward: 120,
+        questions: [
+          { q: "I _________ (see) Maradona play in person once when I was very young.", options: ["have seen", "saw", "see", "was seeing"], correct: 1, reason: "'When I was very young' liquida el tiempo en el pasado, requiere Past Simple 'saw'." },
+          { q: "Argentina's new wonderkid _________ already _________ (score) three goals this season.", options: ["did/score", "have/scored", "has/scored", "was/scoring"], correct: 2, reason: "'Already' te tira el centro para que cabecees con Present Perfect. Sujeto singular: 'has scored'." },
+          { q: "_________ you ever _________ (visit) the Monumental stadium?", options: ["Have/visited", "Did/visit", "Has/visited", "Do/visit"], correct: 0, reason: "Preguntamos por experiencia de vida general en tu carrera ('ever'), va con Present Perfect." },
+          { q: "Garnacho _________ (join) Manchester United in the year 2020.", options: ["has joined", "joined", "joins", "was joining"], correct: 1, reason: "Da el año exacto de la transferencia: 'in 2020', va Past Simple 'joined'." },
+          { q: "We _________ (not win) a match so far in this tournament.", options: ["didn't win", "haven't won", "hasn't won", "don't win"], correct: 1, reason: "'So far' significa 'hasta ahora'. Es un conector directo del Present Perfect." }
+        ]
+      },
+      4: {
+        title: "Día 4: Future Tenses (Will vs. Going to vs. Pres. Continuous)",
+        desc: "¡Octavos de final! <strong>Will</strong> es para decisiones instantáneas o corazonadas (ej. <em>I think Argentina will win</em>). <strong>Going to</strong> es para planes decididos o si hay evidencia firme en la cancha (ej. <em>Look at that! We are going to score!</em>). El <strong>Present Continuous para el futuro</strong> es un arreglo agendado (ej. <em>We are playing Brazil next Friday</em>).",
+        tip: "🚀 Si el arquero rival se lesionó y estás solo frente al arco, hay evidencia: 'We are going to win!'",
+        reward: 120,
+        questions: [
+          { q: "Look at those clouds! It _________ (rain) during the final.", options: ["is going to rain", "will rain", "rains", "is raining"], correct: 0, reason: "Hay evidencia física evidente, usás 'going to' para pronosticar la tormenta." },
+          { q: "The ticket office is closed. No problem! I _________ (buy) them online.", options: ["am going to buy", "will buy", "am buying", "buys"], correct: 1, reason: "Decisión rápida que tomás en el momento de la jugada, usás 'will'." },
+          { q: "The team _________ (play) a friendly against Brazil next Thursday in Miami. It's fully confirmed.", options: ["is playing", "will play", "plays", "going to play"], correct: 0, reason: "Evento cerrado, confirmado y agendado por los dirigentes. Va Present Continuous." },
+          { q: "I think England _________ (not reach) the final this time.", options: ["won't reach", "isn't going to reach", "isn't reaching", "don't reach"], correct: 0, reason: "Es tu pálpito o predicción personal ('I think'), corresponde 'won't'." },
+          { q: "Next month, my parents and I _________ (travel) to Canada to see the World Cup matches. We already have the flights.", options: ["are going to travel", "will travel", "are travelling", "travel"], correct: 2, reason: "Tienen los pasajes comprados. Es un arreglo inamovible de viaje futuro." }
+        ]
+      },
+      5: {
+        title: "Día 5: Past Perfect vs. Past Simple",
+        desc: "¡Cuartos de final calientes! El <strong>Past Perfect</strong> (had + past participle) es el pasado antes del pasado. Lo usás para contar qué jugada pasó ANTES de otra jugada anterior (ej. <em>When we entered, the match had already started</em>).",
+        tip: "⏳ Armá la jugada en orden: lo que pasó primero va en Past Perfect, lo que pasó después de eso va en Past Simple.",
+        reward: 150,
+        questions: [
+          { q: "When we finally turned on the TV, Messi _________ (already / score) the first goal.", options: ["already scored", "has already scored", "had already scored", "was already scoring"], correct: 2, reason: "Messi metió el gol antes de que encendiéramos la tele. El gol va en Past Perfect." },
+          { q: "By the time the coach reached the press conference, the players _________ (shower).", options: ["showered", "had showered", "have showered", "were showering"], correct: 1, reason: "'By the time' te avisa que las duchas terminaron antes de que el DT hable." },
+          { q: "The referee postponed the match because it _________ (rain) heavily for hours before.", options: ["had rained", "rained", "has rained", "was raining"], correct: 0, reason: "La lluvia torrencial ocurrió antes de que el juez suspendiera el partido." },
+          { q: "He was very nervous because he _________ (never / play) in a World Cup final before.", options: ["never played", "had never played", "has never played", "was never playing"], correct: 1, reason: "Experiencia que nunca había vivido antes de ese partido del pasado." },
+          { q: "After Julian Alvarez _________ (score) the third goal, the fans went wild.", options: ["had scored", "scored", "has scored", "was scoring"], correct: 0, reason: "Primero Julián metió el bombazo ('had scored'), después la tribuna festejó ('went wild')." }
+        ]
+      },
+      6: {
+        title: "Día 6: Mixed Tenses Challenge 1",
+        desc: "¡Semifinal de ida! Se mezclan todos los tiempos en la mitad de la cancha. Mantené la cabeza fría, leé los marcadores de tiempo de cada oración y no regales la pelota.",
+        tip: "⚽ ¡Traba con el cerebro! Buscá pistas como 'since', 'while', 'tomorrow' para dar el pase correcto.",
+        reward: 150,
+        questions: [
+          { q: "Currently, Rodrigo De Paul _________ (play) for Atletico Madrid, but he wants to move to Italy.", options: ["plays", "is playing", "played", "has played"], correct: 1, reason: "'Currently' (actualmente) indica una situación transitoria de hoy en día, va con Present Continuous." },
+          { q: "They _________ (not win) any World Cup since they became champions in 1986.", options: ["didn't win", "haven't won", "hadn't won", "don't win"], correct: 1, reason: "'Since' (desde) amarra el pasado con el presente de corrido, requiere Present Perfect." },
+          { q: "Last year, Vinicius Jr. _________ (receive) the award for the most valuable player.", options: ["has received", "received", "was receiving", "had received"], correct: 1, reason: "'Last year' ya terminó del todo en el calendario, va Past Simple 'received'." },
+          { q: "I promise I _________ (give) you my Lionel Messi card if I get a duplicate.", options: ["will give", "am going to give", "give", "am giving"], correct: 0, reason: "Es una promesa firme entre amigos ('I promise'), usamos 'will'." },
+          { q: "While the goalkeeper _________ (put) on his gloves, the match started.", options: ["put", "was putting", "had put", "is putting"], correct: 1, reason: "Estaba en proceso de ponerse los guantes cuando sonó el silbato de arranque." }
+        ]
+      },
+      7: {
+        title: "Día 7: Conditionals (Zero, 1st & 2nd)",
+        desc: "¡Semifinal de vuelta de la copa! El condicional sirve para pensar hipótesis de partidos. <strong>Zero</strong> (verdad absoluta: If + Present, Present). <strong>First</strong> (posibilidad real: If + Present, Will). <strong>Second</strong> (hipótesis o sueño loco de potrero: If + Past, Would).",
+        tip: "🔍 Atenta/o al silbato: Si dice 'If I were you, I would...' (Si fuera vos, yo...) es la típica jugada del 2do condicional.",
+        reward: 180,
+        questions: [
+          { q: "If Argentina _________ (win) tomorrow, we will go directly to the Obelisco to celebrate.", options: ["wins", "will win", "won", "win"], correct: 0, reason: "First Conditional (If + Present, Will). Como Argentina es singular, es 'wins'." },
+          { q: "If I _________ (have) enough money, I would buy a ticket to the final match in New York.", options: ["have", "had", "will have", "would have"], correct: 1, reason: "Second Conditional (If + Past Simple, would). Es un sueño de potrero en el aire." },
+          { q: "If you touch the trophy without winning it, you _________ (get) bad luck according to football superstition.", options: ["got", "will get", "get", "would get"], correct: 2, reason: "Zero Conditional (regla de oro/superstición: If + Present, Present)." },
+          { q: "What _________ you do if you _________ (meet) Messi in real life?", options: ["will/meet", "would/met", "do/meet", "would/meet"], correct: 1, reason: "Pregunta del Second Conditional (situación hipotética imaginaria: would + verbo y Past Simple)." },
+          { q: "If Scaloni _________ (not change) the strategy for the next game, we might lose.", options: ["doesn't change", "won't change", "didn't change", "don't change"], correct: 0, reason: "First Conditional negativo (Present Simple negativo en la cláusula de 'If')." }
+        ]
+      },
+      8: {
+        title: "Día 8: Passive Voice",
+        desc: "¡La final de la Copa está ahí nomás! Usamos la <strong>Voz Pasiva</strong> cuando queremos destacar el objeto o el golazo y no tanto al jugador que la pateó. Estructura: Objeto + verbo TO BE (conjugado) + Pasado Participio (ej. <em>The World Cup was won by Argentina</em>).",
+        tip: "🌟 Pista de oro: Si al final de la oración ves un 'by [alguien]' (por alguien), sabés que el centro es de la Voz Pasiva.",
+        reward: 180,
+        questions: [
+          { q: "The first World Cup _________ (host) by Uruguay in 1930.", options: ["was hosted", "were hosted", "is hosted", "hosted"], correct: 0, reason: "Voz pasiva en pasado de objeto singular ('World Cup was hosted')." },
+          { q: "All tickets for the final match _________ already _________ (sell) online.", options: ["have/been sold", "has/been sold", "were/sold", "are/selling"], correct: 0, reason: "Voz pasiva en Present Perfect para un objeto plural: 'tickets have been sold'." },
+          { q: "The Golden Boot _________ (award) to the player with the most goals at the end of the tournament.", options: ["is awarded", "was awarded", "awarded", "will award"], correct: 0, reason: "Regla fija de la FIFA que ocurre siempre (Presente Pasivo singular: 'is awarded')." },
+          { q: "The stadium _________ (build) right now for the 2026 World Cup matches.", options: ["is built", "is being built", "was built", "is building"], correct: 1, reason: "Pasiva en progreso continuo en este instante: 'is being built'." },
+          { q: "This gorgeous goal _________ (score) by Garnacho in yesterday's training.", options: ["was scored", "scored", "is scored", "was scoring"], correct: 0, reason: "Pasado simple pasivo singular sobre la jugada de ayer: 'was scored'." }
+        ]
+      },
+      9: {
+        title: "Día 9: Mixed Tenses Challenge 2",
+        desc: "¡Final de ida del torneo! Mezclamos tiempos de alta complejidad. El arquero rival achica rápido, no te apures, pensá bien dónde vas a colocar la pelota antes de patear.",
+        tip: "⚽ ¡Elegí con la frialdad de Messi pateando un penal al minuto 90!",
+        reward: 200,
+        questions: [
+          { q: "While we _________ (wait) outside the hotel, the players waved at us.", options: ["waited", "were waiting", "had waited", "are waiting"], correct: 1, reason: "Past Continuous ('were waiting') para la acción larga de esperar que fue interrumpida por el saludo de los cracks." },
+          { q: "He _________ (not play) a match for his national team yet.", options: ["didn't play", "hasn't played", "hadn't played", "doesn't play"], correct: 1, reason: "La palabra 'yet' al final te exige clavar Present Perfect en negativo." },
+          { q: "In 2022, Di Maria _________ (score) a brilliant goal after Mac Allister had passed him the ball.", options: ["scored", "has scored", "had scored", "was scoring"], correct: 0, reason: "El pase ocurrió primero en Past Perfect y el golazo de Angelito vino después, en Past Simple 'scored'." },
+          { q: "I _________ (meet) my soccer friends every Friday at 7 PM for a match.", options: ["am meeting", "meet", "met", "have met"], correct: 1, reason: "Hábito inamovible de los viernes en el barrio, va en Present Simple 'meet'." },
+          { q: "They _________ (celebrate) their victory when the lights in the stadium suddenly went off.", options: ["were celebrating", "celebrated", "had celebrated", "was celebrating"], correct: 0, reason: "La celebración estaba en marcha cuando ocurrió el apagón sorpresivo." }
+        ]
+      },
+      10: {
+        title: "Día 10: Ultimate Championship Exam",
+        desc: "¡La Gran Final por la Copa del Mundo de los verbos! Demostrá toda la jerarquía que ganaste en el potrero estos 10 días. Si lo lográs, ¡quedás 100% lista/o para golear en el examen del colegio!",
+        tip: "🏆 ¡Sos leyenda! Ponela contra un palo y levantá la Copa de los Tiempos Verbales.",
+        reward: 300,
+        questions: [
+          { q: "Messi _________ (be) a professional player since he made his debut for Barcelona in 2004.", options: ["is", "was", "has been", "had been"], correct: 2, reason: "Pista 'since' que conecta el año 2004 con la actualidad ininterrumpida. Va Present Perfect: 'has been'." },
+          { q: "If we had scored that penalty, we _________ (win) the match yesterday.", options: ["would win", "would have won", "will win", "had won"], correct: 1, reason: "Third Conditional (If + Past Perfect, would have + past participle). Una hipótesis del pasado que ya no fue." },
+          { q: "By next year, they _________ (finish) building the new stadium.", options: ["will finish", "will have finished", "finish", "are finishing"], correct: 1, reason: "Future Perfect ('will have finished') para una jugada que estará terminada antes de cierta fecha en el futuro." },
+          { q: "The soccer ball _________ (invent) thousands of years ago by ancient civilizations.", options: ["was invented", "invented", "is invented", "were invented"], correct: 0, reason: "Voz pasiva en pasado sobre la pelota de cuero singular: 'was invented'." },
+          { q: "Next Sunday at 4 PM, I _________ (watch) the World Cup final on the big screen.", options: ["will watch", "will be watching", "am going to watch", "watch"], correct: 1, reason: "Future Continuous ('will be watching') para una acción en desarrollo justo en ese horario programado del domingo." }
+        ]
+      }
+    };
 
     // --- ESTADO LOCAL DEL JUGADOR ACTIVO ---
     let activeNickname = "";
@@ -805,28 +967,28 @@
       if (isCloudEnabled && db) {
         try {
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
-          const docSnap = await getDoc(docRef);
+          const docSnap = await withTimeout(getDoc(docRef), 4000);
 
           if (docSnap.exists()) {
             const data = docSnap.data();
             activeNickname = data.nickname;
             gameState = data;
-            localStorage.setItem('tense_cup_2026_active_profile', nickId);
+            safeSetItem('tense_cup_2026_active_profile', nickId);
             enterGame();
           } else {
             // Verificar si existe en local para migrarlo
-            const savedLocal = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+            const savedLocal = safeGetItem(`tense_cup_2026_profile_${nickId}`);
             if (savedLocal) {
               gameState = JSON.parse(savedLocal);
               activeNickname = gameState.nickname;
               try {
-                await setDoc(docRef, gameState);
-                localStorage.setItem('tense_cup_2026_active_profile', nickId);
+                await withTimeout(setDoc(docRef, gameState), 4000);
+                safeSetItem('tense_cup_2026_active_profile', nickId);
                 enterGame();
                 showAlert(`¡Sincronizamos tu perfil local "${gameState.nickname}" en la nube! 🚀`, "☁️");
               } catch(errUpload) {
                 console.warn("Fallo subiendo perfil local a la nube:", errUpload);
-                localStorage.setItem('tense_cup_2026_active_profile', nickId);
+                safeSetItem('tense_cup_2026_active_profile', nickId);
                 enterGame();
                 showCloudError("Reglas de seguridad Firestore denegadas. Se guardará localmente.", true);
               }
@@ -837,11 +999,11 @@
           }
         } catch (e) {
           console.error("Error al ingresar:", e);
-          const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+          const savedData = safeGetItem(`tense_cup_2026_profile_${nickId}`);
           if (savedData) {
             activeNickname = nickId;
             gameState = JSON.parse(savedData);
-            localStorage.setItem('tense_cup_2026_active_profile', nickId);
+            safeSetItem('tense_cup_2026_active_profile', nickId);
             enterGame();
             showCloudError("Error de conexión cloud, cargamos tu respaldo local.", true);
           } else {
@@ -850,11 +1012,11 @@
           }
         }
       } else {
-        const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        const savedData = safeGetItem(`tense_cup_2026_profile_${nickId}`);
         if (savedData) {
           activeNickname = nickId;
           gameState = JSON.parse(savedData);
-          localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          safeSetItem('tense_cup_2026_active_profile', nickId);
           enterGame();
         } else {
           showAlert(`El perfil local "${inputName}" no existe. ¡Crealo en la solapa de al lado!`, "❓");
@@ -895,7 +1057,7 @@
       if (isCloudEnabled && db) {
         try {
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
-          const docSnap = await getDoc(docRef);
+          const docSnap = await withTimeout(getDoc(docRef), 4000);
 
           if (docSnap.exists()) {
             showAlert("¡Ese apodo ya está en uso por otro crack en la tabla! Elegí otro diferente.", "🚫");
@@ -904,41 +1066,43 @@
           }
 
           // Guardar en la nube
-          await setDoc(docRef, initialProgress);
+          await withTimeout(setDoc(docRef, initialProgress), 4000);
           
           activeNickname = inputName;
           gameState = initialProgress;
-          localStorage.setItem('tense_cup_2026_active_profile', nickId);
-          localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
+          safeSetItem('tense_cup_2026_active_profile', nickId);
+          safeSetItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
           enterGame();
         } catch (e) {
           console.error("Error al registrar:", e);
           
           // Registrar localmente como respaldo
-          localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
+          safeSetItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
           activeNickname = inputName;
           gameState = initialProgress;
-          localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          safeSetItem('tense_cup_2026_active_profile', nickId);
           enterGame();
           
           let errMsg = "No se pudo crear en la nube. Se guardará localmente.";
-          if (e.code === "permission-denied" || e.message.includes("permission")) {
+          if (e.code === "permission-denied" || e.message.includes("permission") || e.message.includes("permiso")) {
             errMsg = "Firestore Database denegó el registro. Activá el modo de prueba (lectura/escritura) en tu Consola Firebase.";
+          } else if (e.message && e.message.includes("Tiempo")) {
+            errMsg = "La conexión con Firebase es lenta. Tu perfil se guardará localmente.";
           }
           showCloudError(errMsg, true);
         }
       } else {
-        const existingLocal = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        const existingLocal = safeGetItem(`tense_cup_2026_profile_${nickId}`);
         if (existingLocal) {
           showAlert("Ese nombre ya existe localmente. Probá ingresando directamente.", "🚫");
           setLoginLoading(false);
           return;
         }
 
-        localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
+        safeSetItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
         activeNickname = nickId;
         gameState = initialProgress;
-        localStorage.setItem('tense_cup_2026_active_profile', nickId);
+        safeSetItem('tense_cup_2026_active_profile', nickId);
         enterGame();
       }
     };
@@ -967,7 +1131,7 @@
       if (isCloudEnabled && db) {
         try {
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
-          const docSnap = await getDoc(docRef);
+          const docSnap = await withTimeout(getDoc(docRef), 4000);
           
           if (docSnap.exists()) {
             gameState = docSnap.data();
@@ -979,11 +1143,11 @@
             document.getElementById('cloud-status-banner').classList.add('hidden');
           } else {
             // No existe en la nube. Busquemos si hay un progreso local para migrarlo
-            const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+            const savedData = safeGetItem(`tense_cup_2026_profile_${nickId}`);
             if (savedData) {
               gameState = JSON.parse(savedData);
               activeNickname = gameState.nickname;
-              await setDoc(docRef, gameState);
+              await withTimeout(setDoc(docRef, gameState), 4000);
               enterGame();
               showAlert(`¡Sincronizamos tu progreso local "${gameState.nickname}" en la nube! 🚀`, "☁️");
               document.getElementById('cloud-success-banner').classList.remove('hidden');
@@ -996,7 +1160,7 @@
           console.error("Error cargando desde Firestore:", e);
           
           let errMsg = "No se pudo leer de la base de datos Firestore.";
-          if (e.code === "permission-denied" || e.message.includes("permission")) {
+          if (e.code === "permission-denied" || e.message.includes("permission") || e.message.includes("permiso")) {
             errMsg = "Reglas de Firestore bloqueadas. Activá el 'modo de prueba' (permitir lectura/escritura) en tu Consola Firebase -> Firestore Database -> Reglas.";
           } else {
             errMsg = `Error de lectura Firestore: ${e.message}`;
@@ -1004,7 +1168,7 @@
           showCloudError(errMsg, true);
           
           // Respaldo local
-          const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+          const savedData = safeGetItem(`tense_cup_2026_profile_${nickId}`);
           if (savedData) {
             gameState = JSON.parse(savedData);
             activeNickname = gameState.nickname;
@@ -1014,7 +1178,7 @@
           }
         }
       } else {
-        const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        const savedData = safeGetItem(`tense_cup_2026_profile_${nickId}`);
         if (savedData) {
           gameState = JSON.parse(savedData);
           activeNickname = gameState.nickname;
@@ -1027,7 +1191,7 @@
     }
 
     function logoutProfileSilently() {
-      localStorage.removeItem('tense_cup_2026_active_profile');
+      safeRemoveItem('tense_cup_2026_active_profile');
       activeNickname = "";
       document.getElementById('user-badge').classList.add('hidden');
       document.getElementById('user-badge').classList.remove('flex');
@@ -1063,7 +1227,7 @@
 
     window.logoutProfile = function() {
       customConfirm("¿Querés cerrar tu sesión para entrar con otro perfil?", "Salir", "Quedarme", () => {
-        localStorage.removeItem('tense_cup_2026_active_profile');
+        safeRemoveItem('tense_cup_2026_active_profile');
         activeNickname = "";
         
         document.getElementById('user-badge').classList.add('hidden');
@@ -1092,12 +1256,12 @@
       if (isCloudEnabled && db && auth.currentUser) {
         try {
           const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
-          await setDoc(docRef, gameState);
+          await withTimeout(setDoc(docRef, gameState), 4000);
         } catch(e) {
           console.error("Error guardando en la nube:", e);
         }
       } else {
-        localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(gameState));
+        safeSetItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(gameState));
       }
       
       updateUI();
@@ -1256,4 +1420,774 @@
       const panel = document.getElementById('day-panel');
       panel.classList.remove('hidden');
 
-      const introDiv = document.getElementById('day
+      const introDiv = document.getElementById('day-intro');
+      const isCompleted = gameState.completedDays.includes(dayNum);
+
+      introDiv.innerHTML = `
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <span class="text-[10px] font-black text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2.5 py-1 rounded-md border border-yellow-400/20">Charla Técnica Oficial</span>
+            <h3 class="text-xl md:text-2xl font-black text-white mt-2">${dayData.title}</h3>
+          </div>
+          <div class="bg-yellow-500/10 border border-yellow-500/30 p-2.5 rounded-2xl text-center min-w-[120px] self-stretch sm:self-auto flex sm:flex-col justify-between items-center sm:justify-center">
+            <span class="text-[10px] text-gray-400 font-bold uppercase">Premio por ganar</span>
+            <span class="font-extrabold text-yellow-400 text-lg">🪙 ${dayData.reward}</span>
+          </div>
+        </div>
+
+        <div class="mt-4 text-gray-300 text-sm leading-relaxed space-y-3 bg-black/20 p-4 rounded-xl border border-emerald-500/10">
+          <p>${dayData.desc}</p>
+          <div class="bg-emerald-500/10 border-l-4 border-emerald-400 p-3 text-xs italic text-emerald-300">
+            ${dayData.tip}
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <button id="btn-start-trivia" class="flex-grow bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/20 text-center transition uppercase text-xs tracking-wider">
+            ${isCompleted ? '⚽ Volver a Jugar (Ganás menos monedas)' : '⚽ Salir a jugar el entrenamiento'}
+          </button>
+        </div>
+      `;
+
+      document.getElementById('btn-start-trivia').addEventListener('click', () => startTrivia(dayNum));
+      document.getElementById('day-trivia').classList.add('hidden');
+    }
+
+    function startTrivia(dayNum) {
+      playSound('click');
+      currentQuestionIndex = 0;
+      tempTriviaScore = 0;
+      selectedAnswer = null;
+
+      const triviaDiv = document.getElementById('day-trivia');
+      triviaDiv.classList.remove('hidden');
+      triviaDiv.scrollIntoView({ behavior: 'smooth' });
+
+      renderTriviaQuestion();
+    }
+
+    function renderTriviaQuestion() {
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      const triviaDiv = document.getElementById('day-trivia');
+
+      selectedAnswer = null;
+      isQuestionAnswered = false; 
+
+      triviaDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Jugada ${currentQuestionIndex + 1} de 5</span>
+          <div class="h-2 w-32 bg-zinc-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-400" style="width: ${(currentQuestionIndex + 1) * 20}%"></div>
+          </div>
+        </div>
+
+        <h4 class="text-base md:text-lg font-bold text-white mb-6 leading-snug bg-emerald-950/60 p-4 rounded-xl border border-emerald-500/20">${qData.q}</h4>
+
+        <div class="grid gap-3" id="options-container">
+          ${qData.options.map((opt, idx) => `
+            <button id="opt-${idx}" class="w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between touch-manipulation">
+              <span>${opt}</span>
+              <span class="text-xs opacity-0" id="badge-${idx}">⚽</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div id="trivia-feedback" class="text-xs font-semibold text-gray-300 hidden sm:max-w-[70%]"></div>
+          <button id="btn-submit-ans" disabled class="w-full sm:w-auto bg-yellow-500 disabled:opacity-50 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl transition shadow-lg shadow-yellow-500/10 uppercase text-xs tracking-wider touch-manipulation">
+            Patear al Arco
+          </button>
+        </div>
+      `;
+
+      // Event listeners para opciones
+      qData.options.forEach((_, idx) => {
+        document.getElementById(`opt-${idx}`).addEventListener('click', () => selectOption(idx));
+      });
+
+      document.getElementById('btn-submit-ans').addEventListener('click', submitAnswer);
+    }
+
+    function selectOption(idx) {
+      playSound('click');
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      
+      if (isQuestionAnswered) {
+        return; 
+      }
+
+      for (let i = 0; i < qData.options.length; i++) {
+        const btn = document.getElementById(`opt-${i}`);
+        const badge = document.getElementById(`badge-${i}`);
+        btn.className = "w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between";
+        badge.classList.add('opacity-0');
+      }
+
+      const activeBtn = document.getElementById(`opt-${idx}`);
+      const activeBadge = document.getElementById(`badge-${idx}`);
+      activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-950 border-2 border-emerald-500 font-semibold text-sm md:text-base flex items-center justify-between text-emerald-300";
+      activeBadge.classList.remove('opacity-0');
+
+      selectedAnswer = idx;
+      document.getElementById('btn-submit-ans').disabled = false;
+    }
+
+    // El motor booleano garantiza que el flujo de preguntas sea inmune a la capitalización de texto de Tailwind.
+    function submitAnswer() {
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      const btn = document.getElementById('btn-submit-ans');
+
+      if (isQuestionAnswered) {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 5) {
+          renderTriviaQuestion();
+        } else {
+          finishTrivia();
+        }
+        return;
+      }
+
+      const feedbackDiv = document.getElementById('trivia-feedback');
+      feedbackDiv.classList.remove('hidden');
+
+      const isCorrect = selectedAnswer === qData.correct;
+
+      for (let i = 0; i < qData.options.length; i++) {
+        document.getElementById(`opt-${i}`).disabled = true;
+      }
+
+      if (isCorrect) {
+        playSound('success');
+        tempTriviaScore++;
+        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
+        activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
+        feedbackDiv.className = "text-sm font-black text-emerald-400 max-w-[70%] flex items-center gap-2";
+        feedbackDiv.innerHTML = "<span>⚽ ¡GOLAZO! ¡La clavaste al ángulo, crack!</span>";
+      } else {
+        playSound('wrong');
+        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
+        if (activeBtn) activeBtn.className = "w-full text-left p-4 rounded-xl bg-red-600 text-white font-semibold text-sm md:text-base flex items-center justify-between";
+        
+        const correctBtn = document.getElementById(`opt-${qData.correct}`);
+        correctBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
+        
+        feedbackDiv.className = "text-xs font-semibold text-red-300 bg-red-950/40 p-3 rounded-lg border border-red-500/20 max-w-[70%]";
+        feedbackDiv.innerHTML = `<strong>¡Uyyy, al palo!</strong> Fijate: ${qData.reason}`;
+      }
+
+      isQuestionAnswered = true;
+      
+      if (currentQuestionIndex < 4) {
+        btn.innerText = "Siguiente Jugada ➡️";
+      } else {
+        btn.innerText = "Terminar Partido 🏆";
+      }
+      btn.disabled = false;
+    }
+
+    function finishTrivia() {
+      playSound('success');
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const isAlreadyCompleted = gameState.completedDays.includes(currentTriviaDay);
+      
+      let earned = 0;
+      if (!isAlreadyCompleted) {
+        earned = dayData.reward;
+        gameState.completedDays.push(currentTriviaDay);
+        const nextDay = currentTriviaDay + 1;
+        if (nextDay <= 10 && !gameState.unlockedDays.includes(nextDay)) {
+          gameState.unlockedDays.push(nextDay);
+        }
+      } else {
+        earned = Math.round(dayData.reward * 0.3); 
+      }
+
+      gameState.coins += earned;
+      saveGame();
+
+      const triviaDiv = document.getElementById('day-trivia');
+      let titleMsg = "¡Final del partido! Gran victoria ⚽";
+      let starsEmoji = "⭐⭐⭐";
+      if (tempTriviaScore === 5) {
+        titleMsg = "🏆 ¡PARTIDO PERFECTO! ¡SOS LEYENDA DEL POTRERO!";
+        starsEmoji = "⭐⭐⭐⭐⭐";
+      } else if (tempTriviaScore >= 3) {
+        starsEmoji = "⭐⭐⭐⭐";
+      }
+
+      triviaDiv.innerHTML = `
+        <div class="text-center py-6 space-y-4">
+          <div class="text-5xl animate-bounce">🏆</div>
+          <h4 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">${titleMsg}</h4>
+          <p class="text-yellow-400 font-extrabold text-xl tracking-widest">${starsEmoji}</p>
+          <p class="text-sm text-gray-300 max-w-md mx-auto">
+            Metiste <strong>${tempTriviaScore} de 5 golazos</strong> correctos. ¡Se nota ese entrenamiento diario!
+          </p>
+
+          <div class="inline-flex items-center gap-3 bg-yellow-500/20 border border-yellow-500/50 p-4 rounded-2xl">
+            <span class="text-3xl">🪙</span>
+            <div class="text-left">
+              <span class="text-[10px] text-gray-400 font-bold block leading-none">RECOMPENSA</span>
+              <span class="text-2xl font-black text-yellow-400">+ ${earned} Monedas</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-col sm:flex-row justify-center gap-3">
+            <button id="btn-res-shop" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-3.5 px-6 rounded-xl transition shadow-lg shadow-yellow-500/20 uppercase text-xs tracking-wider">
+              🛍️ Ir al Kiosquero a comprar sobres
+            </button>
+            <button id="btn-res-calendar" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black py-3.5 px-6 rounded-xl transition uppercase text-xs tracking-wider">
+              📅 Volver al fixture
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('btn-res-shop').addEventListener('click', () => switchView('shop'));
+      document.getElementById('btn-res-calendar').addEventListener('click', () => switchView('train'));
+
+      renderDaysGrid();
+    }
+
+
+    // --- SECCIÓN: GENERADOR DE AVATAR EN SVG (Soporte en caso de error de foto real) ---
+    function generatePlayerAvatarSVG(player) {
+      const skin = player.skin || "#ffd1a4";
+      const legend = player.legend;
+      let jerseyColors = ["#1a8cff", "#ffffff"]; 
+
+      if (player.country === "Francia") jerseyColors = ["#001f3f", "#ffffff"];
+      else if (player.country === "Brasil") jerseyColors = ["#fed100", "#009c3a"];
+      else if (player.country === "Inglaterra") jerseyColors = ["#ffffff", "#000033"];
+      else if (player.country === "Alemania") jerseyColors = ["#ffffff", "#000000"];
+      else if (player.country === "Bélgica") jerseyColors = ["#e30613", "#000000"];
+      else if (player.country === "Polonia") jerseyColors = ["#dc143c", "#ffffff"];
+      else if (player.country === "Uruguay") jerseyColors = ["#5bc2e7", "#ffffff"];
+      else if (player.country === "Colombia") jerseyColors = ["#fcd116", "#003893"];
+      else if (player.country === "España") jerseyColors = ["#c60b1e", "#f1bf00"];
+      else if (player.country === "Canadá") jerseyColors = ["#ff0000", "#ffffff"];
+      else if (player.country === "Corea del Sur") jerseyColors = ["#ff0000", "#000000"];
+      else if (player.country === "Noruega") jerseyColors = ["#ba0c2f", "#00205b"];
+      else if (player.country === "Portugal") jerseyColors = ["#da121a", "#117a3a"];
+      else if (player.country === "Turquía") jerseyColors = ["#e30a17", "#ffffff"];
+      else if (player.country === "Egipto") jerseyColors = ["#c09300", "#000000"];
+
+      let hairColor = "#221100";
+      if (player.hair.includes("rubio") || player.hair.includes("platinad")) hairColor = "#ffdd6b";
+      else if (player.hair.includes("colorado")) hairColor = "#ff6a00";
+      else if (player.hair.includes("fantasía")) hairColor = "#ff00ea";
+
+      let svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-full h-full">
+          <circle cx="50" cy="50" r="48" fill="#141d26" stroke="${legend ? '#d4af37' : '#22c55e'}" stroke-width="1"/>
+          <path d="M50 0 L100 100 L0 100 Z" fill="rgba(255,255,255,0.05)" />
+          <path d="M20 90 C20 70, 80 70, 80 90" fill="${jerseyColors[0]}" />
+          ${player.country === "Argentina" ? `
+            <path d="M38 72 L38 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+            <path d="M50 71 L50 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+            <path d="M62 72 L62 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+          ` : `
+            <path d="M40 73 C40 80, 60 80, 60 73" fill="${jerseyColors[1]}" />
+          `}
+          <rect x="42" y="60" width="16" height="15" fill="${skin}" rx="2" />
+          <circle cx="50" cy="45" r="18" fill="${skin}" />
+          ${player.hair.includes("calvo") ? `
+            <path d="M35 40 C35 30, 65 30, 65 40" stroke="${skin}" stroke-width="1" fill="none"/>
+          ` : `
+            <path d="M32 40 C30 25, 70 25, 68 40 C62 30, 38 30, 32 40" fill="${hairColor}" />
+          `}
+          ${player.hair.includes("rulos") || player.hair.includes("afro") ? `
+            <circle cx="50" cy="24" r="8" fill="${hairColor}" />
+            <circle cx="42" cy="26" r="8" fill="${hairColor}" />
+            <circle cx="58" cy="26" r="8" fill="${hairColor}" />
+            <circle cx="35" cy="32" r="7" fill="${hairColor}" />
+            <circle cx="65" cy="32" r="7" fill="${hairColor}" />
+          ` : ''}
+          <circle cx="44" cy="44" r="2" fill="#333" />
+          <circle cx="56" cy="44" r="2" fill="#333" />
+          <path d="M40 39 Q44 38 48 41" stroke="#221100" stroke-width="1.5" fill="none" />
+          <path d="M60 39 Q56 38 52 41" stroke="#221100" stroke-width="1.5" fill="none" />
+          <path d="M50 43 L50 48 Q50 50 48 50" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none" />
+          <path d="M43 52 Q50 57 57 52" stroke="#221100" stroke-width="1.5" fill="none" />
+        </svg>
+      `;
+      return svg;
+    }
+
+    // --- DISEÑO DE TARJETA CON CARGA DUAL (Imagen Real -> Fallback SVG) ---
+    function getCardHTML(player, isUnlocked = true, count = 1) {
+      if (!isUnlocked) {
+        return `
+          <div class="aspect-[2/3] w-full bg-zinc-900/60 border-2 border-zinc-800 rounded-2xl flex flex-col items-center justify-center p-2.5 relative opacity-60">
+            <span class="text-xl text-zinc-700 font-extrabold">#${player.id}</span>
+            <div class="w-12 h-12 rounded-full bg-zinc-800/80 my-3 flex items-center justify-center">
+              <span class="text-lg text-zinc-600">❓</span>
+            </div>
+            <p class="text-[9px] font-black text-zinc-500 text-center uppercase tracking-wider">${player.name.split(' ')[1] || player.name}</p>
+            <span class="absolute bottom-2 right-2 text-[10px] text-zinc-600 font-bold">${player.emoji}</span>
+          </div>
+        `;
+      }
+
+      let tierColor = "from-emerald-800 via-emerald-900 to-black border-emerald-500 text-emerald-400";
+      let tierGlow = "shadow-md shadow-emerald-500/10";
+      let isLegendary = player.legend || player.category === "legends";
+
+      if (isLegendary) {
+        tierColor = "from-yellow-600 via-amber-950 to-black border-yellow-400 text-yellow-400 card-shiny";
+        tierGlow = "shadow-lg shadow-yellow-500/20";
+      } else if (player.category === "argentina") {
+        tierColor = "from-sky-800 via-sky-950 to-black border-sky-400 text-sky-300";
+        tierGlow = "shadow-md shadow-sky-400/20";
+      } else if (player.category === "rookies") {
+        tierColor = "from-purple-900 via-slate-950 to-black border-purple-400 text-purple-300";
+        tierGlow = "shadow-md shadow-purple-500/10";
+      }
+
+      const avatarFallback = generatePlayerAvatarSVG(player);
+
+      return `
+        <div id="card-inner-${player.id}" class="aspect-[2/3] w-full bg-gradient-to-b ${tierColor} border-2 rounded-2xl p-2 flex flex-col justify-between relative cursor-pointer transform hover:scale-105 active:scale-95 transition duration-300 ${tierGlow} overflow-hidden group">
+          ${isLegendary ? `<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-400/10 via-transparent to-transparent pointer-events-none"></div>` : ''}
+
+          <!-- Header de la Figu -->
+          <div class="flex justify-between items-center z-10">
+            <div class="flex flex-col items-center">
+              <span class="text-base font-black tracking-tighter leading-none text-white">${player.ovr}</span>
+              <span class="text-[7px] font-black uppercase text-gray-300">${player.pos}</span>
+            </div>
+            <span class="text-[10px] font-bold bg-black/40 px-1.5 py-0.5 rounded text-white">${player.emoji}</span>
+          </div>
+
+          <!-- Imagen del Jugador -->
+          <div class="relative w-16 h-16 md:w-18 md:h-18 mx-auto my-1 rounded-full overflow-hidden border border-white/10 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] bg-zinc-950/80">
+            <img src="${player.photoUrl}" alt="${player.name}" class="w-full h-full object-cover animate-fade-in" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+            <div class="hidden w-full h-full">
+              ${avatarFallback}
+            </div>
+          </div>
+
+          <!-- Nombre del Crack -->
+          <div class="text-center z-10">
+            <h4 class="text-[9px] font-black tracking-tight text-white uppercase group-hover:text-yellow-300 transition duration-150 truncate">${player.name}</h4>
+            <p class="text-[7px] text-gray-300 font-medium tracking-wide uppercase leading-none truncate">${player.country}</p>
+          </div>
+
+          <!-- Barra de Stats del Pie -->
+          <div class="grid grid-cols-6 gap-0.5 text-center text-[5px] font-extrabold border-t border-white/10 pt-1 text-white z-10 bg-black/20 p-0.5 rounded">
+            <div>
+              <div class="text-[4px] text-gray-400">PAC</div>
+              <div>${player.stats[0]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">SHO</div>
+              <div>${player.stats[1]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">PAS</div>
+              <div>${player.stats[2]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">DRI</div>
+              <div>${player.stats[3]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">DEF</div>
+              <div>${player.stats[4]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">PHY</div>
+              <div>${player.stats[5]}</div>
+            </div>
+          </div>
+
+          <!-- Distintivos Especiales -->
+          <div class="absolute top-2 right-2 flex items-center gap-1 z-10">
+            ${isLegendary ? `<span class="text-[7px] bg-yellow-400 text-black px-1 rounded font-black">LEYENDA</span>` : ''}
+          </div>
+
+          <!-- Contador de Repetidas -->
+          ${count > 1 ? `
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black font-black text-[9px] px-2 py-0.5 rounded-full shadow-lg border border-white flex items-center gap-1 z-20">
+              <span>Repetidas:</span>
+              <span class="text-xs font-black">${count - 1}</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // --- MI ÁLBUM FILTRADO Y PINTADO ---
+    let currentFilter = 'all';
+
+    window.filterAlbum = function(cat) {
+      playSound('click');
+      currentFilter = cat;
+      
+      const buttons = ['all', 'argentina', 'stars', 'rookies', 'legends', 'repeats'];
+      buttons.forEach(b => {
+        const btn = document.getElementById(`btn-filt-${b}`);
+        if (b === cat) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-500 text-black";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300";
+        }
+      });
+
+      renderAlbumGrid();
+    };
+
+    function renderAlbumGrid() {
+      const grid = document.getElementById('album-grid');
+      grid.innerHTML = "";
+
+      let list = PLAYERS;
+
+      if (currentFilter === 'argentina') {
+        list = PLAYERS.filter(p => p.category === 'argentina');
+      } else if (currentFilter === 'stars') {
+        list = PLAYERS.filter(p => p.category === 'stars');
+      } else if (currentFilter === 'rookies') {
+        list = PLAYERS.filter(p => p.category === 'rookies');
+      } else if (currentFilter === 'legends') {
+        list = PLAYERS.filter(p => p.category === 'legends');
+      } else if (currentFilter === 'repeats') {
+        list = PLAYERS.filter(p => gameState.repeats && gameState.repeats[p.id] && gameState.repeats[p.id] > 0);
+      }
+
+      list.forEach(p => {
+        const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(p.id) : false;
+        const count = hasIt ? (1 + (gameState.repeats[p.id] || 0)) : 0;
+        
+        const cardContainer = document.createElement('div');
+        cardContainer.className = "w-full flex flex-col";
+        cardContainer.innerHTML = getCardHTML(p, hasIt, count);
+        
+        if (hasIt) {
+          const innerCard = cardContainer.querySelector(`#card-inner-${p.id}`);
+          if (innerCard) {
+            innerCard.addEventListener('click', () => openCardZoom(p.id));
+          }
+        }
+
+        if (currentFilter === 'repeats' && count > 1) {
+          const sellBtn = document.createElement('button');
+          sellBtn.className = "w-full mt-2 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[9px] py-1.5 px-2 rounded-lg tracking-wider transition uppercase";
+          sellBtn.innerText = "Vender por 🪙 15";
+          sellBtn.onclick = (e) => {
+            e.stopPropagation();
+            sellRepeat(p.id);
+          };
+          cardContainer.appendChild(sellBtn);
+        }
+
+        grid.appendChild(cardContainer);
+      });
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500 text-sm font-black uppercase">
+            No tenés ninguna figurita de esta categoría. ¡A por más sobres! ⚽
+          </div>
+        `;
+      }
+    }
+
+    function sellRepeat(id) {
+      if (gameState.repeats[id] && gameState.repeats[id] > 0) {
+        playSound('success');
+        gameState.repeats[id]--;
+        gameState.coins += 15; 
+        saveGame();
+        renderAlbumGrid();
+        showAlert("¡Vendiste una repetida al kiosquero por 🪙 15!", "🪙");
+      }
+    }
+
+    // Zoom en Figurita individual
+    function openCardZoom(id) {
+      playSound('click');
+      const player = PLAYERS.find(p => p.id === id);
+      const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(id) : false;
+      if (!player || !hasIt) return;
+
+      const modal = document.getElementById('card-modal');
+      const placeholder = document.getElementById('modal-card-placeholder');
+      const info = document.getElementById('modal-card-info');
+
+      placeholder.innerHTML = getCardHTML(player, true, 1);
+      
+      let isLegendary = player.legend || player.category === "legends";
+
+      info.innerHTML = `
+        <h3 class="text-xl font-black text-white mt-4 uppercase">${player.name}</h3>
+        <p class="text-xs text-yellow-400 font-extrabold uppercase tracking-widest">${player.category === 'argentina' ? 'Héroe de la Scaloneta 🇦🇷' : (isLegendary ? 'Leyenda del Fútbol Mundial 👑' : 'Crack Internacional ⭐')}</p>
+        <p class="text-sm text-gray-300 mt-2 leading-relaxed">
+          Pisa la cancha con su rol de <strong>${player.pos}</strong> con una media de <strong>${player.ovr}</strong>.
+        </p>
+        <div class="mt-4 bg-emerald-950/40 p-3 rounded-2xl text-xs text-gray-300 border border-emerald-500/15">
+          <div class="grid grid-cols-2 gap-2 text-left font-bold">
+            <div>🏃 Ritmo (PAC): <strong>${player.stats[0]}</strong></div>
+            <div>🎯 Tiro (SHO): <strong>${player.stats[1]}</strong></div>
+            <div>👟 Pase (PAS): <strong>${player.stats[2]}</strong></div>
+            <div>🪄 Regate (DRI): <strong>${player.stats[3]}</strong></div>
+            <div>🛡️ Defensa (DEF): <strong>${player.stats[4]}</strong></div>
+            <div>💪 Físico (PHY): <strong>${player.stats[5]}</strong></div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    window.closeCardModal = function() {
+      document.getElementById('card-modal').classList.add('hidden');
+    };
+
+    // --- KIOSCO DE SOBRES (TIENDA) ---
+    let pendingPackRewards = [];
+
+    window.resetOpener = function() {
+      document.getElementById('opener-idle').classList.remove('hidden');
+      document.getElementById('opener-opening').classList.add('hidden');
+      document.getElementById('opener-results').classList.add('hidden');
+      pendingPackRewards = [];
+    };
+
+    window.buyPack = function() {
+      playSound('click');
+      if (gameState.coins < 50) {
+        showAlert("¡Che! No te alcanzan las monedas. Hacé los entrenamientos oficiales para jugar más.", "❌");
+        return;
+      }
+
+      gameState.coins -= 50;
+      gameState.openedPacks = (gameState.openedPacks || 0) + 1;
+      saveGame();
+
+      pendingPackRewards = generatePackFiguritas();
+
+      document.getElementById('opener-idle').classList.add('hidden');
+      document.getElementById('opener-opening').classList.remove('hidden');
+      document.getElementById('opener-results').classList.add('hidden');
+
+      document.getElementById('pack-graphic').className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 shake cursor-pointer";
+      document.getElementById('pack-graphic').onclick = performOpenPack;
+    };
+
+    function generatePackFiguritas() {
+      const generated = [];
+      for (let i = 0; i < 5; i++) {
+        const rand = Math.random() * 100;
+        let selectedCategory = "rookies"; 
+
+        if (rand < 7) {
+          selectedCategory = "legends"; 
+        } else if (rand < 27) {
+          selectedCategory = "argentina"; 
+        } else if (rand < 62) {
+          selectedCategory = "stars"; 
+        }
+
+        const possiblePlayers = PLAYERS.filter(p => p.category === selectedCategory);
+        const chosen = possiblePlayers[Math.floor(Math.random() * possiblePlayers.length)];
+        generated.push(chosen);
+      }
+      return generated;
+    }
+
+    function performOpenPack() {
+      playSound('rustle');
+      
+      const graphic = document.getElementById('pack-graphic');
+      graphic.onclick = null; 
+      graphic.className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 transition duration-500 scale-90 opacity-0";
+
+      setTimeout(() => {
+        document.getElementById('opener-opening').classList.add('hidden');
+        document.getElementById('opener-results').classList.remove('hidden');
+
+        const container = document.getElementById('revealed-cards-container');
+        container.innerHTML = "";
+
+        pendingPackRewards.forEach((player, idx) => {
+          const isRepeat = gameState.collectedIds ? gameState.collectedIds.includes(player.id) : false;
+          const hasLegendary = player.legend || player.category === "legends";
+
+          const cardWrapper = document.createElement('div');
+          cardWrapper.className = "w-28 sm:w-32 flex flex-col items-center gap-1.5 transition duration-500 opacity-0 transform translate-y-4";
+          cardWrapper.innerHTML = `
+            ${getCardHTML(player, true, 1)}
+            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isRepeat ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30' : 'bg-emerald-500 text-black'}">
+              ${isRepeat ? '⚡ REPETIDA' : '✨ ¡NUEVA!'}
+            </span>
+          `;
+
+          container.appendChild(cardWrapper);
+
+          const innerCard = cardWrapper.querySelector(`#card-inner-${player.id}`);
+          if (innerCard) {
+            innerCard.addEventListener('click', () => openCardZoom(player.id));
+          }
+
+          setTimeout(() => {
+            cardWrapper.classList.remove('opacity-0', 'translate-y-4');
+            if (hasLegendary) {
+              playSound('shiny');
+            } else {
+              playSound('click');
+            }
+          }, idx * 300);
+        });
+
+      }, 500);
+    }
+
+    window.collectPackResults = function() {
+      playSound('success');
+
+      if (!gameState.collectedIds) gameState.collectedIds = [];
+      if (!gameState.repeats) gameState.repeats = {};
+
+      pendingPackRewards.forEach(player => {
+        if (!gameState.collectedIds.includes(player.id)) {
+          gameState.collectedIds.push(player.id);
+        } else {
+          if (!gameState.repeats[player.id]) {
+            gameState.repeats[player.id] = 0;
+          }
+          gameState.repeats[player.id]++;
+        }
+      });
+
+      gameState.collectedIds.sort((a,b) => a - b);
+      saveGame();
+      resetOpener();
+      showAlert("¡Figuritas pegadas con plasticola en el álbum!", "📖");
+    };
+
+
+    // --- SECCIÓN: TABLA DE POSICIONES (AMIGOS) ---
+    async function loadFriendsLeaderboard() {
+      const tbody = document.getElementById('leaderboard-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-8">
+            <div class="animate-spin inline-block w-6 h-6 border-4 border-current border-t-transparent text-emerald-500 rounded-full mb-2"></div>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escaneando el vestuario de los amigos...</p>
+          </td>
+        </tr>
+      `;
+
+      let playersList = [];
+
+      if (isCloudEnabled && db) {
+        try {
+          const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
+          const querySnapshot = await withTimeout(getDocs(colRef), 4000);
+          
+          querySnapshot.forEach((doc) => {
+            playersList.push(doc.data());
+          });
+        } catch(e) {
+          console.warn("Fallo cargando multijugador.", e);
+        }
+      }
+
+      if (playersList.length === 0) {
+        playersList.push(gameState);
+        playersList.push({
+          nickname: "Marti_Scaloneta",
+          avatarTeam: "MES",
+          collectedIds: [1, 2, 3, 4, 15, 20, 21, 41, 45],
+          coins: 20,
+          uniquesCount: 9,
+          openedPacks: 3,
+          lastUpdated: new Date().toISOString()
+        });
+        playersList.push({
+          nickname: "Nico_Messi10",
+          avatarTeam: "DIB",
+          collectedIds: [1, 5, 8, 12, 19, 22],
+          coins: 80,
+          uniquesCount: 6,
+          openedPacks: 2,
+          lastUpdated: new Date().toISOString()
+        });
+        playersList.push({
+          nickname: "Sofi_Potrero",
+          avatarTeam: "JUL",
+          collectedIds: [1, 15, 31, 34, 48],
+          coins: 100,
+          uniquesCount: 5,
+          openedPacks: 1,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      playersList.sort((a, b) => {
+        const countA = a.collectedIds ? a.collectedIds.length : 0;
+        const countB = b.collectedIds ? b.collectedIds.length : 0;
+        return countB - countA;
+      });
+
+      tbody.innerHTML = "";
+
+      playersList.forEach((player, idx) => {
+        const uniques = player.collectedIds ? player.collectedIds.length : 0;
+        const percent = Math.round((uniques / 50) * 100);
+        const hero = AVATAR_PLAYERS.find(t => t.code === player.avatarTeam) || AVATAR_PLAYERS[0];
+        const isCurrent = sanitizeNickname(player.nickname) === sanitizeNickname(gameState.nickname);
+
+        const dateStr = player.lastUpdated ? new Date(player.lastUpdated).toLocaleDateString() : "Hoy";
+
+        const tr = document.createElement('tr');
+        tr.className = isCurrent ? "bg-emerald-500/10 border-l-4 border-emerald-500" : "hover:bg-zinc-900/40";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-black">
+            ${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`))}
+          </td>
+          <td class="py-3 px-4 flex items-center gap-2">
+            <span class="text-xl">${hero.emoji}</span>
+            <div>
+              <span class="font-black ${isCurrent ? 'text-emerald-400' : 'text-gray-200'}">${player.nickname}</span>
+              ${isCurrent ? '<span class="text-[9px] bg-emerald-500 text-black px-1.5 py-0.5 rounded ml-1.5 font-bold uppercase tracking-wider">VOS</span>' : ''}
+            </div>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="font-extrabold text-emerald-400">${uniques} / 50</div>
+            <div class="text-[10px] text-gray-400 font-bold uppercase">${percent}% PEGADO</div>
+          </td>
+          <td class="py-3 px-4 text-center text-gray-400">${player.openedPacks || 0}</td>
+          <td class="py-3 px-4 text-center text-yellow-500 font-bold">🪙 ${player.coins}</td>
+          <td class="py-3 px-4 text-right text-xs text-gray-500">${dateStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- MANEJO DEL MODAL DE CONFIGURACIÓN ---
+    window.openCloudConfigModal = function() {
+      playSound('click');
+      document.getElementById('cloud-config-modal').classList.remove('hidden');
+    };
+    window.closeCloudConfigModal = function() {
+      playSound('click');
+      document.getElementById('cloud-config-modal').classList.add('hidden');
+    };
+
+    // --- AL CARGAR LA PÁGINA ---
+    // Ejecutar inicialización inmediatamente en lugar de esperar un onload que ya pudo haber ocurrido
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      initFirebase();
+    } else {
+      window.addEventListener('load', initFirebase);
+    }
+
+  </script>
+
+</body>
+</html>
