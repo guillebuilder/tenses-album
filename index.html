@@ -721,136 +721,136 @@
     ];
     let selectedAvatarIndex = 0;
 
-    // --- PLAN DE ESTUDIO / DESAFÍOS DE 10 DÍAS ---
+    // --- PLAN DE ESTUDIO / DESAFÍOS DE 10 DÍAS (ACTUALIZADO A MIXED TENSES + TOP 50 VERBOS IRREGULARES) ---
     const DAYS_DATA = {
       1: {
-        title: "Día 1: Present Simple vs. Present Continuous",
-        desc: "¡Empezamos la pretemporada en el potrero! Usamos el <strong>Present Simple</strong> para rutinas y cosas que siempre pasan en la cancha (ej. <em>Messi plays football every day</em>). Usamos el <strong>Present Continuous</strong> para lo que está pasando en este preciso momento (ej. <em>Look! Julián is shooting the ball now</em>).",
-        tip: "⚠️ Ojo al dato: Palabras clave como 'always, usually, every day' llaman al Simple. Mientras que 'now, at the moment, look!' mandan al Continuous de cabeza.",
+        title: "Día 1: Simple Present",
+        desc: "¡Arrancamos la pretemporada en el potrero! Hoy entrenamos el <strong>Simple Present</strong>. Lo usamos para hablar de rutinas, hábitos y verdades de los jugadores en su vida diaria (ej. <em>Messi trains every day / Dibu lives in England</em>).",
+        tip: "⚠️ Regla de Oro del DT: Si hablás de él o ella (He, She, It), agregale una 'S' o 'ES' al verbo al final (ej. <em>play ➡️ plays / watch ➡️ watches</em>). ¡Para 'I, We, They, You' el verbo queda igual!",
         reward: 100,
         questions: [
-          { q: "Messi usually _________ (train) in Miami, but today he is playing a match in Argentina.", options: ["trains", "is training", "train", "trained"], correct: 0, reason: "Usamos 'trains' (Present Simple) porque 'usually' indica una rutina o hábito del diez." },
-          { q: "Look! Scaloni _________ (talk) to the referee right now.", options: ["talks", "is talking", "talked", "is talk"], correct: 1, reason: "La jugada dice 'Look!' y 'right now'. Está pasando en vivo, requiere Present Continuous." },
-          { q: "The Argentine fans always _________ (sing) during the matches.", options: ["singing", "are singing", "sing", "sings"], correct: 2, reason: "'Always' indica costumbre popular de la tribuna, y como 'fans' es plural, va 'sing'." },
-          { q: "At the moment, Mbappe _________ (recover) from a muscle injury.", options: ["is recovering", "recovers", "recovering", "recover"], correct: 0, reason: "'At the moment' (en este momento) te pide que pongas Present Continuous." },
-          { q: "We _________ (watch) World Cup videos every single evening.", options: ["are watching", "watches", "watch", "watched"], correct: 2, reason: "'Every evening' marca rutina hogareña, va en Present Simple para el grupo 'We'." }
+          { q: "Messi usually _________ (train) in Miami, but today he is on a plane.", options: ["trains", "is training", "train", "trained"], correct: 0, reason: "Usamos 'trains' porque 'usually' indica una rutina de Messi (He)." },
+          { q: "Argentine fans _________ (love) football more than anything else.", options: ["love", "loves", "are loving", "loved"], correct: 0, reason: "Fans (plural/They) no lleva 'S' al final del verbo en presente simple." },
+          { q: "The referee always _________ (carry) a whistle in his pocket during matches.", options: ["carries", "carry", "carrying", "carried"], correct: 0, reason: "The referee (He) es tercera persona singular, por lo tanto 'carry' cambia a 'carries'." },
+          { q: "We always _________ (drink) mate before watching the game on Sundays.", options: ["drink", "drinks", "are drinking", "drank"], correct: 0, reason: "Con el pronombre plural 'We' (nosotros), el verbo va en infinitivo simple: 'drink'." },
+          { q: "De Paul _________ (not play) as a goalkeeper; he is a midfielder.", options: ["doesn't play", "don't play", "isn't playing", "didn't play"], correct: 0, reason: "Para negar en presente simple con 'He', usamos el auxiliar 'doesn't' + el verbo en infinitivo." }
         ]
       },
       2: {
-        title: "Día 2: Past Simple vs. Past Continuous",
-        desc: "¡Primer amistoso duro! El <strong>Past Simple</strong> describe jugadas terminadas en el pasado (ej. <em>We won the cup in 2022</em>). El <strong>Past Continuous</strong> describe acciones largas que se estaban jugando en el pasado cuando algo las cortó (ej. <em>I was watching the match when the lights went out</em>).",
-        tip: "💡 Truco del DT: Usamos 'while' seguido de Past Continuous (was/were + -ing) y 'when' para la patada que frena todo en Past Simple.",
+        title: "Día 2: Present Continuous",
+        desc: "¡La pelota está rodando en vivo! Hoy jugamos con el <strong>Present Continuous</strong>. Lo usamos para relatar lo que está pasando en la cancha en este preciso momento (ej. <em>Look! Garnacho is running!</em>).",
+        tip: "💡 Fórmula de vestuario: Se arma con el verbo TO BE (am/is/are) + el verbo principal terminado en <strong>-ING</strong> (ej. <em>is kicking / are singing</em>).",
         reward: 100,
         questions: [
-          { q: "While Dibu Martínez _________ (jump) to save the ball, he hurt his leg.", options: ["jumped", "was jumping", "were jumping", "is jumping"], correct: 1, reason: "La palabra 'While' (mientras) te pide una acción en progreso en el pasado." },
-          { q: "Argentina _________ (win) the World Cup in Qatar four years ago.", options: ["win", "winned", "was winning", "won"], correct: 3, reason: "'Four years ago' es un tiempo específico y terminado. Usamos el glorioso pasado simple 'won'." },
-          { q: "When the referee blew the whistle, the players _________ (celebrate) on the pitch.", options: ["were celebrating", "was celebrating", "celebrated", "celebrate"], correct: 0, reason: "Estaban celebrando (acción larga) cuando el réferi tocó el silbato de golpe." },
-          { q: "Messi _________ (score) an amazing free-kick last night.", options: ["was scoring", "scores", "scored", "is scoring"], correct: 2, reason: "'Last night' cerró el partido de anoche, va en Past Simple: 'scored'." },
-          { q: "What _________ you _________ (do) when Mac Allister scored the goal?", options: ["were/doing", "was/doing", "did/do", "are/doing"], correct: 0, reason: "Pregunta sobre qué acción estabas jugando en el pasado en el momento exacto del golazo." }
+          { q: "Look! Messi _________ (dribble) past three defenders right now!", options: ["is dribbling", "dribbles", "dribble", "was dribbling"], correct: 0, reason: "Las palabras 'Look!' y 'right now' nos avisan que está pasando en este instante." },
+          { q: "The match is live! Dibu Martínez _________ (stand) in front of the goal at this moment.", options: ["is standing", "stands", "stand", "was standing"], correct: 0, reason: "Al decir 'at this moment' se requiere el Present Continuous con 'is standing'." },
+          { q: "Listen! The stadium _________ (sing) a song for the Scaloneta.", options: ["is singing", "sings", "sing", "singing"], correct: 0, reason: "'Listen!' (¡Escuchá!) indica que la tribuna está cantando ahora mismo." },
+          { q: "Garnacho and Julián _________ (warm up) on the sideline right now.", options: ["are warming up", "is warming up", "warm up", "warms up"], correct: 0, reason: "Como el sujeto es plural (Garnacho and Julián = They), usamos el auxiliar 'are' + warming up." },
+          { q: "Why _________ you _________ (cry)? The match is not over!", options: ["are/crying", "do/cry", "is/crying", "did/cry"], correct: 0, reason: "Pregunta en presente continuo para una acción en desarrollo: 'Why are you crying?'" }
         ]
       },
       3: {
-        title: "Día 3: Present Perfect vs. Past Simple",
-        desc: "¡Fase de grupos picante! El <strong>Present Perfect</strong> (have/has + participle) se usa para tus copas ganadas o experiencias de vida (ej. <em>I have met Messi twice</em>) sin decir cuándo. El <strong>Past Simple</strong> va si das la fecha exacta del partido (ej. <em>I met him in 2024</em>).",
-        tip: "⚡ Clave de vestuario: Si la oración dice 'yesterday, in 2022, last year', clavas Past Simple. Si dice 'ever, never, already, yet', vas con Present Perfect.",
+        title: "Día 3: Simple Present vs. Present Continuous",
+        desc: "¡Duelo de tenses en mitad de cancha! Hoy aprendemos a decidir rápido: ¿Rutina o Acción en vivo? (<em>Messi plays football every weekend, but today he is resting on the bench</em>).",
+        tip: "🔍 Clave táctica: Buscá palabras de rutina (usually, always, every day) ➡️ Simple Present. Buscá palabras del ahora (right now, look, at the moment) ➡️ Present Continuous.",
         reward: 120,
         questions: [
-          { q: "I _________ (see) Maradona play in person once when I was very young.", options: ["have seen", "saw", "see", "was seeing"], correct: 1, reason: "'When I was very young' liquida el tiempo en el pasado, requiere Past Simple 'saw'." },
-          { q: "Argentina's new wonderkid _________ already _________ (score) three goals this season.", options: ["did/score", "have/scored", "has/scored", "was/scoring"], correct: 2, reason: "'Already' te tira el centro para que cabecees con Present Perfect. Sujeto singular: 'has scored'." },
-          { q: "_________ you ever _________ (visit) the Monumental stadium?", options: ["Have/visited", "Did/visit", "Has/visited", "Do/visit"], correct: 0, reason: "Preguntamos por experiencia de vida general en tu carrera ('ever'), va con Present Perfect." },
-          { q: "Garnacho _________ (join) Manchester United in the year 2020.", options: ["has joined", "joined", "joins", "was joining"], correct: 1, reason: "Da el año exacto de la transferencia: 'in 2020', va Past Simple 'joined'." },
-          { q: "We _________ (not win) a match so far in this tournament.", options: ["didn't win", "haven't won", "hasn't won", "don't win"], correct: 1, reason: "'So far' significa 'hasta ahora'. Es un conector directo del Present Perfect." }
+          { q: "Julián Álvarez usually _________ (play) as a striker, but today he is on the left wing.", options: ["plays", "is playing", "play", "played"], correct: 0, reason: "'Usually' marca el hábito/puesto normal de Julián, por lo que usamos Present Simple." },
+          { q: "Shh! I _________ (watch) the Superclásico right now; please don't make noise.", options: ["am watching", "watch", "watches", "watched"], correct: 0, reason: "'Right now' exige de inmediato colocar Present Continuous ('am watching')." },
+          { q: "The coach never _________ (shout) during training, but look! He is doing it now.", options: ["shouts", "is shouting", "shout", "shouted"], correct: 0, reason: "'Never' es un adverbio de frecuencia que requiere Simple Present ('shouts')." },
+          { q: "Currently, Lautaro _________ (lead) the scorers list, but Haaland wants to pass him.", options: ["is leading", "leads", "lead", "led"], correct: 0, reason: "'Currently' (actualmente/en este momento) requiere Present Continuous." },
+          { q: "Dibu always _________ (wear) green gloves, but today he is wearing red ones.", options: ["wears", "is wearing", "wear", "wore"], correct: 0, reason: "'Always' (siempre) marca una rutina fija del arquero, usamos presente simple: 'wears'." }
         ]
       },
       4: {
-        title: "Día 4: Future Tenses (Will vs. Going to vs. Pres. Continuous)",
-        desc: "¡Octavos de final! <strong>Will</strong> es para decisiones instantáneas o corazonadas (ej. <em>I think Argentina will win</em>). <strong>Going to</strong> es para planes decididos o si hay evidencia firme en la cancha (ej. <em>Look at that! We are going to score!</em>). El <strong>Present Continuous para el futuro</strong> es un arreglo agendado (ej. <em>We are playing Brazil next Friday</em>).",
-        tip: "🚀 Si el arquero rival se lesionó y estás solo frente al arco, hay evidencia: 'We are going to win!'",
+        title: "Día 4: Irregular Verbs - Fase 1 (Top 10)",
+        desc: "¡Entrenamiento especial de resistencia! Los verbos irregulares no siguen la regla de agregar '-ed' en el pasado, sino que cambian de forma por completo. Hoy entrenamos el pasado de 10 verbos clave de la lista de los 50 más comunes: <strong>win, see, go, run, sing, make, write, eat, speak</strong> y <strong>be</strong>.",
+        tip: "📋 Memorizá esta pizarra del DT:<br>• win ➡️ won<br>• see ➡️ saw<br>• go ➡️ went<br>• run ➡️ ran<br>• sing ➡️ sang<br>• write ➡️ wrote<br>• speak ➡️ spoke",
         reward: 120,
         questions: [
-          { q: "Look at those clouds! It _________ (rain) during the final.", options: ["is going to rain", "will rain", "rains", "is raining"], correct: 0, reason: "Hay evidencia física evidente, usás 'going to' para pronosticar la tormenta." },
-          { q: "The ticket office is closed. No problem! I _________ (buy) them online.", options: ["am going to buy", "will buy", "am buying", "buys"], correct: 1, reason: "Decisión rápida que tomás en el momento de la jugada, usás 'will'." },
-          { q: "The team _________ (play) a friendly against Brazil next Thursday in Miami. It's fully confirmed.", options: ["is playing", "will play", "plays", "going to play"], correct: 0, reason: "Evento cerrado, confirmado y agendado por los dirigentes. Va Present Continuous." },
-          { q: "I think England _________ (not reach) the final this time.", options: ["won't reach", "isn't going to reach", "isn't reaching", "don't reach"], correct: 0, reason: "Es tu pálpito o predicción personal ('I think'), corresponde 'won't'." },
-          { q: "Next month, my parents and I _________ (travel) to Canada to see the World Cup matches. We already have the flights.", options: ["are going to travel", "will travel", "are travelling", "travel"], correct: 2, reason: "Tienen los pasajes comprados. Es un arreglo inamovible de viaje futuro." }
+          { q: "Yesterday, the Scaloneta _________ (win) the friendly match 3-0!", options: ["won", "winned", "wins", "was winning"], correct: 0, reason: "El pasado de 'win' es irregular y se escribe 'won'. ¡No existe 'winned'!" },
+          { q: "When I was 8 years old, I _________ (see) Messi score a free kick live.", options: ["saw", "seed", "see", "was seeing"], correct: 0, reason: "El pasado del verbo 'see' (ver) es irregular: 'saw'." },
+          { q: "After the final whistle, the players _________ (go) straight to the locker room.", options: ["went", "goed", "go", "gone"], correct: 0, reason: "El verbo 'go' (ir) cambia completamente en el pasado simple irregular a 'went'." },
+          { q: "During the match, Enzo _________ (run) 12 kilometers around the entire pitch.", options: ["ran", "runned", "runs", "is running"], correct: 0, reason: "El pasado de 'run' (correr) es 'ran'. ¡'Runned' es tarjeta roja directa!" },
+          { q: "The singer _________ (sing) the National Anthem beautifully before the kickoff.", options: ["sang", "sung", "singed", "sings"], correct: 0, reason: "El pasado de 'sing' (cantar) es 'sang' (ej. <em>she sang</em>)." }
         ]
       },
       5: {
-        title: "Día 5: Past Perfect vs. Past Simple",
-        desc: "¡Cuartos de final calientes! El <strong>Past Perfect</strong> (had + past participle) es el pasado antes del pasado. Lo usás para contar qué jugada pasó ANTES de otra jugada anterior (ej. <em>When we entered, the match had already started</em>).",
-        tip: "⏳ Armá la jugada en orden: lo que pasó primero va en Past Perfect, lo que pasó después de eso va en Past Simple.",
+        title: "Día 5: Simple Past",
+        desc: "¡Partido histórico! El <strong>Simple Past</strong> se usa para acciones que empezaron y terminaron en el pasado (ej. <em>We won the final in 2022</em>). Si el verbo es regular, le agregás <strong>-ed</strong> al final. Si es irregular, usás su forma propia.",
+        tip: "⏱️ Marcadores del pasado: Si la oración tiene 'yesterday, last week, last month, in 2022, ago', meté Simple Past sin dudar.",
         reward: 150,
         questions: [
-          { q: "When we finally turned on the TV, Messi _________ (already / score) the first goal.", options: ["already scored", "has already scored", "had already scored", "was already scoring"], correct: 2, reason: "Messi metió el gol antes de que encendiéramos la tele. El gol va en Past Perfect." },
-          { q: "By the time the coach reached the press conference, the players _________ (shower).", options: ["showered", "had showered", "have showered", "were showering"], correct: 1, reason: "'By the time' te avisa que las duchas terminaron antes de que el DT hable." },
-          { q: "The referee postponed the match because it _________ (rain) heavily for hours before.", options: ["had rained", "rained", "has rained", "was raining"], correct: 0, reason: "La lluvia torrencial ocurrió antes de que el juez suspendiera el partido." },
-          { q: "He was very nervous because he _________ (never / play) in a World Cup final before.", options: ["never played", "had never played", "has never played", "was never playing"], correct: 1, reason: "Experiencia que nunca había vivido antes de ese partido del pasado." },
-          { q: "After Julian Alvarez _________ (score) the third goal, the fans went wild.", options: ["had scored", "scored", "has scored", "was scoring"], correct: 0, reason: "Primero Julián metió el bombazo ('had scored'), después la tribuna festejó ('went wild')." }
+          { q: "Scaloni _________ (decide) to change the tactics in the second half of yesterday's match.", options: ["decided", "decides", "was deciding", "decide"], correct: 0, reason: "'Decide' es un verbo regular, por ende en pasado simple le agregamos la 'd': 'decided'." },
+          { q: "Last Saturday, the striker _________ (miss) the penalty kick in the last minute.", options: ["missed", "miss", "was missing", "has missed"], correct: 0, reason: "Al decir 'Last Saturday' nos referimos al pasado simple del verbo regular 'miss' ➡️ 'missed'." },
+          { q: "We _________ (stay) up late to celebrate the victory last night.", options: ["stayed", "stay", "were staying", "stays"], correct: 0, reason: "Verbo regular 'stay' en pasado simple es 'stayed' debido a la pista 'last night'." },
+          { q: "The club _________ (sign) a new young talent from Argentina last month.", options: ["signed", "signs", "sign", "was signing"], correct: 0, reason: "Pasado simple regular: 'signed' por la indicación temporal 'last month'." },
+          { q: "Did you _________ (watch) the legendary World Cup final in 2022?", options: ["watch", "watched", "watching", "watches"], correct: 0, reason: "⚠️ ¡Atento! En preguntas con el auxiliar 'Did', el verbo vuelve a su forma base (infinitivo): 'watch'." }
         ]
       },
       6: {
-        title: "Día 6: Mixed Tenses Challenge 1",
-        desc: "¡Semifinal de ida! Se mezclan todos los tiempos en la mitad de la cancha. Mantené la cabeza fría, leé los marcadores de tiempo de cada oración y no regales la pelota.",
-        tip: "⚽ ¡Traba con el cerebro! Buscá pistas como 'since', 'while', 'tomorrow' para dar el pase correcto.",
+        title: "Día 6: Past Continuous",
+        desc: "¡Cámara lenta! El <strong>Past Continuous</strong> describe una acción que estaba ocurriendo en el pasado en un momento exacto (ej. <em>At 5 PM yesterday, we were screaming for the goal</em>). Es el equivalente a nuestro 'estaba jugando'.",
+        tip: "🛡️ Se arma con el pasado del verbo TO BE (was para 'I, He, She, It' / were para 'We, They, You') + el verbo principal con <strong>-ING</strong>.",
         reward: 150,
         questions: [
-          { q: "Currently, Rodrigo De Paul _________ (play) for Atletico Madrid, but he wants to move to Italy.", options: ["plays", "is playing", "played", "has played"], correct: 1, reason: "'Currently' (actualmente) indica una situación transitoria de hoy en día, va con Present Continuous." },
-          { q: "They _________ (not win) any World Cup since they became champions in 1986.", options: ["didn't win", "haven't won", "hadn't won", "don't win"], correct: 1, reason: "'Since' (desde) amarra el pasado con el presente de corrido, requiere Present Perfect." },
-          { q: "Last year, Vinicius Jr. _________ (receive) the award for the most valuable player.", options: ["has received", "received", "was receiving", "had received"], correct: 1, reason: "'Last year' ya terminó del todo en el calendario, va Past Simple 'received'." },
-          { q: "I promise I _________ (give) you my Lionel Messi card if I get a duplicate.", options: ["will give", "am going to give", "give", "am giving"], correct: 0, reason: "Es una promesa firme entre amigos ('I promise'), usamos 'will'." },
-          { q: "While the goalkeeper _________ (put) on his gloves, the match started.", options: ["put", "was putting", "had put", "is putting"], correct: 1, reason: "Estaba en proceso de ponerse los guantes cuando sonó el silbato de arranque." }
+          { q: "At 4 PM yesterday, the team _________ (train) under the heavy rain.", options: ["was training", "were training", "trained", "is training"], correct: 0, reason: "Sujeto singular 'the team' (como un grupo/it) lleva el auxiliar 'was' + 'training'." },
+          { q: "The fans _________ (scream) with joy when suddenly the referee cancelled the goal.", options: ["were screaming", "was screaming", "screamed", "scream"], correct: 0, reason: "Sujeto plural 'The fans' (ellos/they) requiere el auxiliar 'were' + 'screaming'." },
+          { q: "Dibu Martínez _________ (look) at the striker right before he saved the penalty.", options: ["was looking", "were looking", "looked", "looks"], correct: 0, reason: "Dibu (He) requiere el pasado continuo en singular: 'was looking'." },
+          { q: "While my dad and I _________ (discuss) the lineup, the game started.", options: ["were discussing", "was discussing", "discussed", "discuss"], correct: 0, reason: "'My dad and I' equivale a 'We' (nosotros), por ende lleva el auxiliar plural 'were discussing'." },
+          { q: "What _________ you _________ (do) at the exact moment of the championship goal?", options: ["were/doing", "was/doing", "did/do", "are/doing"], correct: 0, reason: "Pregunta en pasado continuo para el pronombre 'you': 'What were you doing?'" }
         ]
       },
       7: {
-        title: "Día 7: Conditionals (Zero, 1st & 2nd)",
-        desc: "¡Semifinal de vuelta de la copa! El condicional sirve para pensar hipótesis de partidos. <strong>Zero</strong> (verdad absoluta: If + Present, Present). <strong>First</strong> (posibilidad real: If + Present, Will). <strong>Second</strong> (hipótesis o sueño loco de potrero: If + Past, Would).",
-        tip: "🔍 Atenta/o al silbato: Si dice 'If I were you, I would...' (Si fuera vos, yo...) es la típica jugada del 2do condicional.",
+        title: "Día 7: Simple Past vs. Past Continuous",
+        desc: "¡Acción interrumpida! En los partidos de fútbol, una acción que estaba en progreso (Past Continuous) suele ser cortada por un evento repentino (Simple Past). Ej: <em>I was watching the replay (acción larga) when the lights went out (interrupción corta)</em>.",
+        tip: "🔗 Conectores de potrero: Usamos <strong>while</strong> seguido de Past Continuous (was/were -ing) y <strong>when</strong> seguido de Simple Past (pasado simple directo).",
         reward: 180,
         questions: [
-          { q: "If Argentina _________ (win) tomorrow, we will go directly to the Obelisco to celebrate.", options: ["wins", "will win", "won", "win"], correct: 0, reason: "First Conditional (If + Present, Will). Como Argentina es singular, es 'wins'." },
-          { q: "If I _________ (have) enough money, I would buy a ticket to the final match in New York.", options: ["have", "had", "will have", "would have"], correct: 1, reason: "Second Conditional (If + Past Simple, would). Es un sueño de potrero en el aire." },
-          { q: "If you touch the trophy without winning it, you _________ (get) bad luck according to football superstition.", options: ["got", "will get", "get", "would get"], correct: 2, reason: "Zero Conditional (regla de oro/superstición: If + Present, Present)." },
-          { q: "What _________ you do if you _________ (meet) Messi in real life?", options: ["will/meet", "would/met", "do/meet", "would/meet"], correct: 1, reason: "Pregunta del Second Conditional (situación hipotética imaginaria: would + verbo y Past Simple)." },
-          { q: "If Scaloni _________ (not change) the strategy for the next game, we might lose.", options: ["doesn't change", "won't change", "didn't change", "don't change"], correct: 0, reason: "First Conditional negativo (Present Simple negativo en la cláusula de 'If')." }
+          { q: "While Mac Allister _________ (run) with the ball, a defender tripped him.", options: ["was running", "ran", "were running", "runs"], correct: 0, reason: "'While' (mientras) introduce la acción en progreso: 'was running'." },
+          { q: "Garnacho was celebrating his goal when the referee _________ (blow) the whistle.", options: ["blew", "blowed", "was blowing", "blows"], correct: 0, reason: "'When' introduce la acción corta que interrumpe. El pasado irregular de 'blow' es 'blew'." },
+          { q: "We _________ (watch) the match on TV when the electricity went out.", options: ["were watching", "watched", "was watching", "watch"], correct: 0, reason: "La acción larga que estaba ocurriendo en el sillón va en Past Continuous plural: 'were watching'." },
+          { q: "The striker injured his knee while he _________ (try) to control the pass.", options: ["was trying", "tried", "were trying", "tries"], correct: 0, reason: "La acción larga que estaba intentando hacer mientras corría requiere 'was trying'." },
+          { q: "When the coach _________ (arrive) at the stadium, the players were warming up.", options: ["arrived", "was arriving", "arrives", "arrive"], correct: 0, reason: "'When' nos indica el suceso corto del pasado que interrumpió el calentamiento: 'arrived'." }
         ]
       },
       8: {
-        title: "Día 8: Passive Voice",
-        desc: "¡La final de la Copa está ahí nomás! Usamos la <strong>Voz Pasiva</strong> cuando queremos destacar el objeto o el golazo y no tanto al jugador que la pateó. Estructura: Objeto + verbo TO BE (conjugado) + Pasado Participio (ej. <em>The World Cup was won by Argentina</em>).",
-        tip: "🌟 Pista de oro: Si al final de la oración ves un 'by [alguien]' (por alguien), sabés que el centro es de la Voz Pasiva.",
+        title: "Día 8: Irregular Verbs - Fase 2 (Top 20)",
+        desc: "¡Segunda tanda del entrenamiento de resistencia irregular! Hoy dominamos el pasado de otros 10 verbos súper comunes de la lista sagrada: <strong>buy, give, have, make, catch, take, meet, write, speak</strong> y <strong>build</strong>.",
+        tip: "📋 Anotador táctico del vestuario:<br>• buy ➡️ bought<br>• give ➡️ gave<br>• have ➡️ had<br>• make ➡️ made<br>• take ➡️ took<br>• meet ➡️ met<br>• build ➡️ built",
         reward: 180,
         questions: [
-          { q: "The first World Cup _________ (host) by Uruguay in 1930.", options: ["was hosted", "were hosted", "is hosted", "hosted"], correct: 0, reason: "Voz pasiva en pasado de objeto singular ('World Cup was hosted')." },
-          { q: "All tickets for the final match _________ already _________ (sell) online.", options: ["have/been sold", "has/been sold", "were/sold", "are/selling"], correct: 0, reason: "Voz pasiva en Present Perfect para un objeto plural: 'tickets have been sold'." },
-          { q: "The Golden Boot _________ (award) to the player with the most goals at the end of the tournament.", options: ["is awarded", "was awarded", "awarded", "will award"], correct: 0, reason: "Regla fija de la FIFA que ocurre siempre (Presente Pasivo singular: 'is awarded')." },
-          { q: "The stadium _________ (build) right now for the 2026 World Cup matches.", options: ["is built", "is being built", "was built", "is building"], correct: 1, reason: "Pasiva en progreso continuo en este instante: 'is being built'." },
-          { q: "This gorgeous goal _________ (score) by Garnacho in yesterday's training.", options: ["was scored", "scored", "is scored", "was scoring"], correct: 0, reason: "Pasado simple pasivo singular sobre la jugada de ayer: 'was scored'." }
+          { q: "My uncle _________ (buy) me the official Argentina jersey last week as a gift!", options: ["bought", "buyed", "buys", "was buying"], correct: 0, reason: "El pasado del verbo irregular 'buy' (comprar) es 'bought'. ¡No existe 'buyed'!" },
+          { q: "Messi _________ (give) a beautiful pass to Julián for the second goal.", options: ["gave", "gived", "gives", "was giving"], correct: 0, reason: "El pasado de 'give' (dar) es irregular: 'gave'." },
+          { q: "The team _________ (have) a secret strategy meeting before entering the field.", options: ["had", "haved", "has", "was having"], correct: 0, reason: "El pasado de 'have' (tener/haber) es 'had'." },
+          { q: "The defender _________ (make) a huge mistake that led to the opponent's goal.", options: ["made", "maked", "makes", "was making"], correct: 0, reason: "El pasado del verbo 'make' (hacer/crear) se escribe 'made'." },
+          { q: "I _________ (meet) Dibu Martínez at the airport yesterday and got his autograph!", options: ["met", "meeted", "meets", "was meeting"], correct: 0, reason: "El pasado de 'meet' (conocer/reunirse) es irregular: 'met' (con una sola 'e')." }
         ]
       },
       9: {
-        title: "Día 9: Mixed Tenses Challenge 2",
-        desc: "¡Final de ida del torneo! Mezclamos tiempos de alta complejidad. El arquero rival achica rápido, no te apures, pensá bien dónde vas a colocar la pelota antes de patear.",
-        tip: "⚽ ¡Elegí con la frialdad de Messi pateando un penal al minuto 90!",
+        title: "Día 9: Future Simple (Will) vs. Going to",
+        desc: "¡Planificando el Mundial 2026! Usamos <strong>Going to</strong> para planes confirmados o cuando hay una evidencia clara en el partido (ej. <em>Look! It's going to rain</em>). Usamos <strong>Will</strong> para opiniones, predicciones o promesas instantáneas (ej. <em>I think Argentina will win</em>).",
+        tip: "🚀 Truco de potrero: 'Will' es una corazonada o promesa espontánea. 'Going to' es cuando ya tenés la jugada armada o la evidencia frente a tus ojos.",
         reward: 200,
         questions: [
-          { q: "While we _________ (wait) outside the hotel, the players waved at us.", options: ["waited", "were waiting", "had waited", "are waiting"], correct: 1, reason: "Past Continuous ('were waiting') para la acción larga de esperar que fue interrumpida por el saludo de los cracks." },
-          { q: "He _________ (not play) a match for his national team yet.", options: ["didn't play", "hasn't played", "hadn't played", "doesn't play"], correct: 1, reason: "La palabra 'yet' al final te exige clavar Present Perfect en negativo." },
-          { q: "In 2022, Di Maria _________ (score) a brilliant goal after Mac Allister had passed him the ball.", options: ["scored", "has scored", "had scored", "was scoring"], correct: 0, reason: "El pase ocurrió primero en Past Perfect y el golazo de Angelito vino después, en Past Simple 'scored'." },
-          { q: "I _________ (meet) my soccer friends every Friday at 7 PM for a match.", options: ["am meeting", "meet", "met", "have met"], correct: 1, reason: "Hábito inamovible de los viernes en el barrio, va en Present Simple 'meet'." },
-          { q: "They _________ (celebrate) their victory when the lights in the stadium suddenly went off.", options: ["were celebrating", "celebrated", "had celebrated", "was celebrating"], correct: 0, reason: "La celebración estaba en marcha cuando ocurrió el apagón sorpresivo." }
+          { q: "Look at the goalkeeper! He is not ready. The striker _________ (score) easily.", options: ["is going to score", "will score", "scores", "scored"], correct: 0, reason: "Hay evidencia física inminente (el arquero distraído), por eso usamos 'is going to score'." },
+          { q: "I promise I _________ (not duplicate) your favorite Messi card in my next pack opening.", options: ["won't duplicate", "am not going to duplicate", "don't duplicate", "was not duplicating"], correct: 0, reason: "Para promesas firmes ('I promise') siempre utilizamos el futuro simple con 'will' / 'won't'." },
+          { q: "Next year, my family _________ (travel) to the US to see the opening match. We already booked the hotel.", options: ["is going to travel", "will travel", "travels", "travelled"], correct: 0, reason: "Como ya reservamos el hotel, es un plan o intención confirmada, requiere 'is going to travel'." },
+          { q: "I think Argentina _________ (win) the next World Cup in 2026.", options: ["will win", "is going to win", "wins", "won"], correct: 0, reason: "Es una creencia, opinión o predicción personal del hincha ('I think'), usamos 'will win'." },
+          { q: "Wait! I _________ (get) you a glass of water before the penalty shootout starts.", options: ["will get", "am going to get", "get", "got"], correct: 0, reason: "Es un ofrecimiento espontáneo tomado en el momento, se utiliza 'will get'." }
         ]
       },
       10: {
-        title: "Día 10: Ultimate Championship Exam",
-        desc: "¡La Gran Final por la Copa del Mundo de los verbos! Demostrá toda la jerarquía que ganaste en el potrero estos 10 días. Si lo lográs, ¡quedás 100% lista/o para golear en el examen del colegio!",
-        tip: "🏆 ¡Sos leyenda! Ponela contra un palo y levantá la Copa de los Tiempos Verbales.",
+        title: "Día 10: La Gran Final de la Tense Cup",
+        desc: "¡Llegamos a la final en el Estadio Azteca! Hoy demostrás que sos la/el campeona/ón del inglés. Esta trivia mezcla los 6 tiempos verbales del torneo y el uso de los verbos irregulares más famosos.",
+        tip: "🏆 ¡Jugá con el alma! Ponela contra un palo, respondé concentrada/o y completá tu álbum de figuritas.",
         reward: 300,
         questions: [
-          { q: "Messi _________ (be) a professional player since he made his debut for Barcelona in 2004.", options: ["is", "was", "has been", "had been"], correct: 2, reason: "Pista 'since' que conecta el año 2004 con la actualidad ininterrumpida. Va Present Perfect: 'has been'." },
-          { q: "If we had scored that penalty, we _________ (win) the match yesterday.", options: ["would win", "would have won", "will win", "had won"], correct: 1, reason: "Third Conditional (If + Past Perfect, would have + past participle). Una hipótesis del pasado que ya no fue." },
-          { q: "By next year, they _________ (finish) building the new stadium.", options: ["will finish", "will have finished", "finish", "are finishing"], correct: 1, reason: "Future Perfect ('will have finished') para una jugada que estará terminada antes de cierta fecha en el futuro." },
-          { q: "The soccer ball _________ (invent) thousands of years ago by ancient civilizations.", options: ["was invented", "invented", "is invented", "were invented"], correct: 0, reason: "Voz pasiva en pasado sobre la pelota de cuero singular: 'was invented'." },
-          { q: "Next Sunday at 4 PM, I _________ (watch) the World Cup final on the big screen.", options: ["will watch", "will be watching", "am going to watch", "watch"], correct: 1, reason: "Future Continuous ('will be watching') para una acción en desarrollo justo en ese horario programado del domingo." }
+          { q: "Usually, we _________ (play) on Saturdays, but this week we are playing on Sunday.", options: ["play", "are playing", "played", "will play"], correct: 0, reason: "'Usually' nos marca un hábito general, por lo tanto requiere presente simple: 'play'." },
+          { q: "While the goalkeeper _________ (put) on his gloves, the striker kicked the ball.", options: ["was putting", "put", "had put", "is putting"], correct: 0, reason: "Acción en progreso en el pasado interrumpida por un zapatazo: Past Continuous ('was putting')." },
+          { q: "Last year, my brother _________ (buy) the gold Maradona card on the virtual market.", options: ["bought", "buyed", "buys", "has bought"], correct: 0, reason: "'Last year' exige el pasado simple del verbo irregular 'buy' ➡️ 'bought'." },
+          { q: "I think the coach _________ (make) changes in the lineup for tomorrow's match.", options: ["will make", "is going to make", "makes", "made"], correct: 0, reason: "Opinión personal sobre el futuro ('I think') ➡️ 'will make'." },
+          { q: "Right now, Cuti Romero _________ (defend) the ball against Haaland.", options: ["is defending", "defends", "defended", "will defend"], correct: 0, reason: "'Right now' nos exige colocar el presente continuo en vivo: 'is defending'." }
         ]
       }
     };
@@ -1412,6 +1412,30 @@
     let selectedAnswer = null;
     let isQuestionAnswered = false; 
 
+    // Mapeo de verbos irregulares de respaldo para visualización pedagógica interactiva (los 50 verbos)
+    const TOP_50_IRREGULAR_VERBS = [
+      { inf: "be", past: "was/were", trans: "ser / estar" },
+      { inf: "buy", past: "bought", trans: "comprar" },
+      { inf: "win", past: "won", trans: "ganar" },
+      { inf: "go", past: "went", trans: "ir" },
+      { inf: "see", past: "saw", trans: "ver" },
+      { inf: "run", past: "ran", trans: "correr" },
+      { inf: "sing", past: "sang", trans: "cantar" },
+      { inf: "write", past: "wrote", trans: "escribir" },
+      { inf: "speak", past: "spoke", trans: "hablar" },
+      { inf: "have", past: "had", trans: "tener" },
+      { inf: "make", past: "made", trans: "hacer" },
+      { inf: "give", past: "gave", trans: "dar" },
+      { inf: "take", past: "took", trans: "tomar" },
+      { inf: "meet", past: "met", trans: "conocer / reunirse" },
+      { inf: "build", past: "built", trans: "construir" },
+      { inf: "think", past: "thought", trans: "pensar" },
+      { inf: "find", past: "found", trans: "encontrar" },
+      { inf: "do", past: "did", trans: "hacer" },
+      { inf: "say", past: "said", trans: "decir" },
+      { inf: "catch", past: "caught", trans: "atrapar / atajar" }
+    ];
+
     function loadDayDetail(dayNum) {
       const dayData = DAYS_DATA[dayNum];
       if (!dayData) return;
@@ -1422,6 +1446,38 @@
 
       const introDiv = document.getElementById('day-intro');
       const isCompleted = gameState.completedDays.includes(dayNum);
+
+      let extraContent = "";
+      // Mostrar un pizarrón dinámico con verbos irregulares en el Día 4 y Día 8
+      if (dayNum === 4) {
+        extraContent = `
+          <div class="mt-4 bg-zinc-900 border border-zinc-700/50 rounded-2xl p-4">
+            <h4 class="text-xs font-black text-yellow-400 uppercase tracking-widest mb-3 flex items-center gap-1">📋 Pizarrón del DT: Lista de Verbos Irregulares (Parte 1)</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+              ${TOP_50_IRREGULAR_VERBS.slice(0, 10).map(v => `
+                <div class="bg-black/40 p-2 rounded-lg border border-zinc-800 text-[11px]">
+                  <div class="font-extrabold text-white">${v.inf} ➡️ <span class="text-yellow-400">${v.past}</span></div>
+                  <div class="text-gray-500 text-[9px] font-semibold mt-0.5">${v.trans}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (dayNum === 8) {
+        extraContent = `
+          <div class="mt-4 bg-zinc-900 border border-zinc-700/50 rounded-2xl p-4">
+            <h4 class="text-xs font-black text-yellow-400 uppercase tracking-widest mb-3 flex items-center gap-1">📋 Pizarrón del DT: Lista de Verbos Irregulares (Parte 2)</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+              ${TOP_50_IRREGULAR_VERBS.slice(10, 20).map(v => `
+                <div class="bg-black/40 p-2 rounded-lg border border-zinc-800 text-[11px]">
+                  <div class="font-extrabold text-white">${v.inf} ➡️ <span class="text-yellow-400">${v.past}</span></div>
+                  <div class="text-gray-500 text-[9px] font-semibold mt-0.5">${v.trans}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
 
       introDiv.innerHTML = `
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1441,6 +1497,8 @@
             ${dayData.tip}
           </div>
         </div>
+
+        ${extraContent}
 
         <div class="mt-6 flex flex-col sm:flex-row gap-3">
           <button id="btn-start-trivia" class="flex-grow bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/20 text-center transition uppercase text-xs tracking-wider">
@@ -1534,7 +1592,6 @@
       document.getElementById('btn-submit-ans').disabled = false;
     }
 
-    // El motor booleano garantiza que el flujo de preguntas sea inmune a la capitalización de texto de Tailwind.
     function submitAnswer() {
       const dayData = DAYS_DATA[currentTriviaDay];
       const qData = dayData.questions[currentQuestionIndex];
