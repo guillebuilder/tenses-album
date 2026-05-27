@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tense Cup 2026 - El Álbum de los Tiempos Verbales</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at center, #0e2a1b 0%, #05100a 100%);
+      color: #f3f4f6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .text-glow {
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    }
+    .card-shiny::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.6) 50%, transparent 55%);
+      transform: rotate(45deg);
+      animation: shinyEffect 3s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes shinyEffect {
+      0% { transform: translate(-30%, -30%) rotate(45deg); }
+      100% { transform: translate(30%, 30%) rotate(45deg); }
+    }
+    .shake {
+      animation: shakePack 0.5s ease-in-out infinite;
+    }
+    @keyframes shakePack {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-3deg) scale(1.03); }
+      75% { transform: rotate(3deg) scale(1.03); }
+    }
+  </style>
+</head>
+<body class="min-h-screen overflow-x-hidden flex flex-col">
+
+  <!-- Sonidos Sintetizados (Web Audio API) -->
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } else if (type === 'shiny') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } else if (type === 'rustle') {
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000;
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        noise.start();
+      }
+    }
+  </script>
+
+  <!-- Encabezado Global -->
+  <header class="bg-black/80 backdrop-blur-md border-b border-emerald-500/30 sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-tr from-yellow-400 to-amber-600 p-2 rounded-xl shadow-lg">
+          <span class="text-2xl">🏆</span>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-black italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-yellow-400 leading-none">TENSE CUP 2026</h1>
+          <p class="text-[10px] md:text-xs text-emerald-400 font-extrabold uppercase tracking-widest mt-1 flex items-center gap-1">
+            <span>⚽ ¡El Álbum de los cracks del potrero!</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Datos de Sesión y Estadísticas -->
+      <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
+        <!-- Badge Jugador/a -->
+        <div id="user-badge" class="hidden items-center gap-2 bg-emerald-950/85 border border-emerald-500/40 px-3 py-1.5 rounded-full text-xs font-bold text-emerald-200">
+          <span id="user-avatar-icon">👕</span>
+          <span id="user-name-display">Crack</span>
+          <button onclick="logoutProfile()" class="text-[10px] text-red-400 hover:text-red-300 underline ml-1.5 font-black uppercase">Salir</button>
+        </div>
+        <!-- Monedas -->
+        <div class="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/40 px-3 py-1.5 rounded-full" title="Tus Monedas">
+          <span>🪙</span>
+          <span id="header-coins" class="font-black text-yellow-400 text-xs md:text-sm">0</span>
+        </div>
+        <!-- Progreso del Álbum -->
+        <div class="flex items-center gap-1 bg-emerald-500/20 border border-emerald-500/40 px-3 py-1.5 rounded-full" title="Progreso del Álbum">
+          <span>📖</span>
+          <span id="header-album-progress" class="font-black text-emerald-300 text-xs md:text-sm">0/50</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banners de Sincronización -->
+  <div id="cloud-status-banner" class="bg-amber-500/10 border-b border-amber-500/20 text-center py-1.5 text-xs text-amber-300 font-bold hidden">
+    ⚠️ Jugando sin conexión (Modo Local). Tus amigos no verán tu progreso. 
+    <button onclick="openCloudConfigModal()" class="underline text-yellow-400 ml-1 hover:text-yellow-300 font-black font-semibold">¿Cómo jugar con amigos?</button>
+  </div>
+  <div id="cloud-success-banner" class="bg-emerald-500/10 border-b border-emerald-500/20 text-center py-1.5 text-xs text-emerald-300 font-bold hidden">
+    ⚡ ¡Conectado al Vestuario de la Nube! Tus amigos te ven jugar en tiempo real.
+  </div>
+
+  <!-- Contenedor Principal con Vistas Dinámicas -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-4 md:py-6 flex flex-col">
+    
+    <!-- Barra de Navegación Principal de Vistas -->
+    <div id="main-navigation" class="grid grid-cols-4 gap-1.5 mb-6 max-w-xl mx-auto w-full hidden">
+      <button id="nav-train" onclick="switchView('train')" class="py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 shadow-lg border">
+        <span class="text-lg">⚽</span>
+        <span class="text-[9px] md:text-xs uppercase">Entrenar</span>
+      </button>
+      <button id="nav-album" onclick="switchView('album')" class="py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 shadow-lg border">
+        <span class="text-lg">📖</span>
+        <span class="text-[9px] md:text-xs uppercase">Álbum</span>
+      </button>
+      <button id="nav-shop" onclick="switchView('shop')" class="py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 shadow-lg border">
+        <span class="text-lg">🛍️</span>
+        <span class="text-[9px] md:text-xs uppercase">Kiosco</span>
+      </button>
+      <button id="nav-friends" onclick="switchView('friends')" class="py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 shadow-lg border">
+        <span class="text-lg">🏆</span>
+        <span class="text-[9px] md:text-xs uppercase">Amigos</span>
+      </button>
+    </div>
+
+    <!-- ==================== PANTALLA DE ACCESO / LOGIN (OBLIGATORIA) ==================== -->
+    <section id="view-login" class="flex-grow flex items-center justify-center py-6">
+      <div class="bg-zinc-950/90 border border-emerald-500/30 p-6 md:p-8 rounded-3xl max-w-md w-full shadow-2xl space-y-6 relative overflow-hidden">
+        
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-sky-400/10 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+
+        <div class="text-center">
+          <span class="text-5xl block mb-2">⚽</span>
+          <h2 class="text-2xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-emerald-400 to-sky-400 uppercase tracking-tight">¡A LA CANCHA, CRACK!</h2>
+          <p class="text-xs text-gray-300 mt-2">Armá tu perfil, elegí a tu referente de la Scaloneta y empezá a coleccionar a los cracks del Mundial mientras la rompés en inglés.</p>
+        </div>
+
+        <!-- Pestañas de Login o Registro -->
+        <div class="grid grid-cols-2 gap-2 bg-zinc-900 p-1 rounded-xl text-center">
+          <button id="btn-tab-signin" onclick="switchLoginTab('signin')" class="py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 bg-emerald-500 text-black">Ya juego la copa</button>
+          <button id="btn-tab-signup" onclick="switchLoginTab('signup')" class="py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 text-gray-400">Crear perfil nuevo</button>
+        </div>
+
+        <!-- FORMULARIO 1: INGRESAR -->
+        <form id="form-signin" onsubmit="handleSignIn(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-black text-gray-400 uppercase mb-1.5">Tu nombre o apodo en el potrero:</label>
+            <input type="text" id="signin-nickname" required placeholder="Ej: Sofi, Santi, Martu, Luli" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-emerald-500 text-emerald-200">
+          </div>
+          <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-4 px-6 rounded-xl shadow-lg shadow-emerald-500/20 transform active:scale-95 transition text-xs uppercase tracking-widest">
+            🏃 Entrar al vestuario
+          </button>
+        </form>
+
+        <!-- FORMULARIO 2: CREAR PERFIL -->
+        <form id="form-signup" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-black text-gray-400 uppercase mb-1.5">Escribí tu nombre o apodo:</label>
+            <input type="text" id="signup-nickname" required placeholder="Ej: Sofi, Santi, Martu, Luli" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-emerald-500 text-emerald-200">
+            <span class="text-[10px] text-zinc-500 mt-1 block">Sin espacios ni símbolos raros. ¡Que sea cortito!</span>
+          </div>
+
+          <!-- Selección de Ídolo de la Scaloneta -->
+          <div>
+            <label class="block text-xs font-black text-gray-400 uppercase mb-2">Elegí tu referente de la Scaloneta:</label>
+            <div class="grid grid-cols-5 gap-1.5" id="avatar-selector">
+              <!-- Cargado dinámicamente -->
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-6 rounded-xl shadow-lg shadow-yellow-500/20 transform active:scale-95 transition text-xs uppercase tracking-widest">
+            ✨ Salir a la cancha con mi Álbum
+          </button>
+        </form>
+
+        <!-- Indicador de Carga -->
+        <div id="login-loading" class="hidden text-center py-4 space-y-2">
+          <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-emerald-500 rounded-full" role="status"></div>
+          <p class="text-xs text-emerald-400 font-black uppercase tracking-wider">¡El árbitro está revisando el VAR de tu perfil!</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 1: ENTRENAR (PLAN DE 10 DÍAS) ==================== -->
+    <section id="view-train" class="space-y-6 hidden">
+      <div class="bg-black/30 border border-emerald-500/20 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-xl md:text-2xl font-black text-emerald-300 mb-1">🏃 ¡La Pretemporada de la Scaloneta!</h2>
+          <p class="text-xs md:text-sm text-gray-300 leading-relaxed">
+            Meté 5 o 10 minutos de entrenamiento diario y convertite en crack de los tiempos verbales (*mixed tenses*). ¡Cada entrenamiento oficial terminado te da <strong>Monedas de Oro (🪙)</strong> para vaciar el kiosco!
+          </p>
+        </div>
+        <div id="training-progress-header" class="bg-emerald-950/60 px-4 py-2.5 rounded-xl border border-emerald-500/20 text-xs font-black text-emerald-400 uppercase tracking-wider shrink-0">
+          Entrenamientos completados: 0 / 10
+        </div>
+      </div>
+
+      <!-- Cuadrícula de 10 Días -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div id="days-grid" class="contents"></div>
+      </div>
+
+      <!-- Panel de Detalle del Día Seleccionado / Trivia -->
+      <div id="day-panel" class="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-6 shadow-2xl hidden relative">
+        <div id="day-intro">
+          <!-- Intro gramatical del día -->
+        </div>
+        <div id="day-trivia" class="hidden mt-6 pt-6 border-t border-emerald-500/20">
+          <!-- Preguntas de Trivia -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 2: MI ÁLBUM (50 FIGURITAS) ==================== -->
+    <section id="view-album" class="hidden space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-black/30 p-5 rounded-2xl border border-emerald-500/20">
+        <div>
+          <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-emerald-400">📖 Mi Álbum Mundial 2026</h2>
+          <p class="text-sm text-gray-300">Coleccioná a los 50 cracks del planeta. Tocá las que ya tenés para ver su ficha técnica.</p>
+        </div>
+        <!-- Selector de Categorías -->
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="filterAlbum('all')" id="btn-filt-all" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-500 text-black">Todas</button>
+          <button onclick="filterAlbum('argentina')" id="btn-filt-argentina" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300">La Scaloneta 🇦🇷</button>
+          <button onclick="filterAlbum('stars')" id="btn-filt-stars" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300">Estrellas ⭐</button>
+          <button onclick="filterAlbum('rookies')" id="btn-filt-rookies" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300">Joyas Sub-21 💎</button>
+          <button onclick="filterAlbum('legends')" id="btn-filt-legends" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300">Leyendas 👑</button>
+          <button onclick="filterAlbum('repeats')" id="btn-filt-repeats" class="px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300">Repe (vender)</button>
+        </div>
+      </div>
+
+      <!-- Estadísticas rápidas -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-black/20 p-4 rounded-xl border border-emerald-500/10 text-center">
+          <div class="text-xs text-gray-400 font-bold uppercase">Únicas pegadas</div>
+          <div id="stats-uniques" class="text-2xl font-black text-emerald-400 mt-1">0 / 50</div>
+        </div>
+        <div class="bg-black/20 p-4 rounded-xl border border-emerald-500/10 text-center">
+          <div class="text-xs text-gray-400 font-bold uppercase">Figus Repetidas</div>
+          <div id="stats-repeats" class="text-2xl font-black text-yellow-500 mt-1">0</div>
+        </div>
+        <div class="bg-black/20 p-4 rounded-xl border border-emerald-500/10 text-center">
+          <div class="text-xs text-gray-400 font-bold uppercase">Sobres rotos</div>
+          <div id="stats-opened" class="text-2xl font-black text-cyan-400 mt-1">0</div>
+        </div>
+        <div class="bg-black/20 p-4 rounded-xl border border-emerald-500/10 text-center">
+          <div class="text-xs text-gray-400 font-bold uppercase">Álbum Completo</div>
+          <div id="stats-percent" class="text-2xl font-black text-purple-400 mt-1">0%</div>
+        </div>
+      </div>
+
+      <!-- Grid del Álbum -->
+      <div id="album-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <!-- Renderizado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 3: TIENDA DE SOBRES ==================== -->
+    <section id="view-shop" class="hidden space-y-6">
+      <div class="bg-black/30 border border-emerald-500/20 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300">🛒 El Kiosco del Potrero</h2>
+          <p class="text-sm text-gray-300">Cambiá tus monedas de oro ganadas estudiando por sobres oficiales. ¡Cada uno trae 5 figus!</p>
+        </div>
+        <div class="text-right shrink-0">
+          <span class="text-xs text-emerald-400 font-black block mb-1">TUS MONEDAS</span>
+          <div class="inline-flex items-center gap-2 bg-yellow-500/20 border border-yellow-500/40 px-5 py-2.5 rounded-full">
+            <span class="text-xl">🪙</span>
+            <span id="shop-coins-val" class="font-extrabold text-yellow-400 text-xl">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Compra de Sobre -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Paquete de Sobres Standard -->
+        <div class="bg-gradient-to-b from-emerald-950 to-emerald-900 border border-emerald-500/40 p-6 rounded-2xl flex flex-col items-center text-center shadow-lg hover:border-emerald-400 transition">
+          <div class="w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl relative shadow-2xl flex flex-col justify-between p-3 border-4 border-yellow-300 overflow-hidden transform hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent"></div>
+            <div class="text-center z-10">
+              <span class="text-[10px] font-black text-black bg-white px-2 py-0.5 rounded uppercase">Mundial 2026</span>
+              <h3 class="text-base font-black text-black italic tracking-tighter mt-1">SOBRE OFICIAL</h3>
+            </div>
+            <div class="flex justify-center z-10">
+              <span class="text-5xl drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]">⚽</span>
+            </div>
+            <div class="text-center z-10">
+              <p class="text-xs font-black text-white bg-black/60 py-1 px-3 rounded-full uppercase tracking-wider">5 CRACKS</p>
+            </div>
+          </div>
+          <h3 class="text-lg font-black mt-4">Sobre del Mundial</h3>
+          <p class="text-xs text-gray-400 mt-1 mb-4">Asegura pibes de la Scaloneta o estrellas mundiales para pegar.</p>
+          <button onclick="buyPack()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-6 rounded-xl shadow-lg shadow-yellow-500/20 transform active:scale-95 transition uppercase text-xs tracking-wider">
+            Comprar por 🪙 50
+          </button>
+        </div>
+
+        <!-- Animador/Apertura de Sobres -->
+        <div id="pack-opener-area" class="md:col-span-2 bg-black/40 border border-dashed border-emerald-500/30 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[400px]">
+          <div id="opener-idle" class="text-center space-y-3">
+            <span class="text-5xl block">🛍️</span>
+            <p class="text-lg font-black text-gray-400">¡Cerrá la compra de un sobre para abrirlo acá!</p>
+            <p class="text-xs text-gray-500 max-w-sm mx-auto">Cada sobre trae 5 figuritas reales para completar tu colección.</p>
+          </div>
+
+          <div id="opener-opening" class="hidden flex flex-col items-center w-full">
+            <div id="pack-graphic" class="w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 shake cursor-pointer">
+              <span class="text-5xl">⚡</span>
+              <span class="text-xs font-black text-black mt-3 uppercase tracking-widest text-center px-2">¡Rompé el sobre haciendo click!</span>
+            </div>
+            <p class="text-sm text-yellow-400 font-black mt-4 animate-pulse uppercase tracking-wider">¡Apretá arriba para revelar los cracks!</p>
+          </div>
+
+          <div id="opener-results" class="hidden w-full space-y-4">
+            <h3 class="text-xl font-black text-emerald-400 text-center uppercase tracking-wide">🎉 ¡Tus nuevas figuritas en la mesa!</h3>
+            <div id="revealed-cards-container" class="flex flex-wrap justify-center gap-4 py-4"></div>
+            <div class="text-center pt-2">
+              <button onclick="collectPackResults()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-black py-4 px-10 rounded-xl shadow-lg shadow-emerald-500/20 transition uppercase text-xs tracking-widest">
+                Pegar en el Álbum
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 4: TABLA DE POSICIONES DE AMIGOS ==================== -->
+    <section id="view-friends" class="hidden space-y-6">
+      <div class="bg-black/30 border border-emerald-500/20 p-5 rounded-2xl">
+        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-300 to-yellow-400 uppercase">🏆 La Tabla de la Cuadra / Amigas y Amigos</h2>
+        <p class="text-sm text-gray-300">¿Quién va a llenar primero el álbum de 50 cracks? ¡Metanle garra al estudio para sacarles ventaja!</p>
+      </div>
+
+      <!-- Lista de Amigas Registradas -->
+      <div class="bg-zinc-950/80 border border-emerald-500/20 rounded-2xl p-4 shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-emerald-500/20 text-xs text-emerald-400 font-black tracking-widest uppercase">
+                <th class="py-3 px-4">Puesto</th>
+                <th class="py-3 px-4">Crack</th>
+                <th class="py-3 px-4 text-center">Únicas Conseguidas</th>
+                <th class="py-3 px-4 text-center">Sobres Rotos</th>
+                <th class="py-3 px-4 text-center">Billetera</th>
+                <th class="py-3 px-4 text-right">Última Jugada</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body" class="divide-y divide-zinc-900 text-sm font-semibold">
+              <!-- Cargado dinámicamente -->
+              <tr>
+                <td colspan="6" class="text-center py-8 text-gray-500">Buscando las posiciones en la tabla...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal de Zoom de Figurita -->
+  <div id="card-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-emerald-500/30 p-5 rounded-3xl max-w-sm w-full relative flex flex-col items-center max-h-[90vh] overflow-y-auto">
+      <button onclick="closeCardModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+      <div id="modal-card-placeholder" class="w-56 h-80 my-2"></div>
+      <div id="modal-card-info" class="text-center w-full"></div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación Personalizado (Fútbol Style) -->
+  <div id="confirm-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-950 border-2 border-red-500/40 p-6 rounded-2xl max-w-sm w-full text-center space-y-4">
+      <div class="text-4xl">🚨</div>
+      <h3 id="confirm-title" class="text-lg font-black text-red-400 uppercase tracking-wide">¿Estás seguro/a?</h3>
+      <p id="confirm-message" class="text-xs text-gray-300 leading-relaxed"></p>
+      <div class="flex justify-center gap-3 pt-2">
+        <button id="btn-confirm-yes" class="bg-red-600 hover:bg-red-500 text-white font-black py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider transition"></button>
+        <button id="btn-confirm-no" class="bg-zinc-800 hover:bg-zinc-700 text-gray-300 font-black py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider transition"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configuración de Firebase (Guía interactiva) -->
+  <div id="cloud-config-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-yellow-500/40 p-6 rounded-2xl max-w-lg w-full relative space-y-4 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeCloudConfigModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+      <span class="text-4xl">🚀</span>
+      <h3 class="text-xl font-black text-yellow-400">¿Cómo conectar el juego al vestuario en la nube?</h3>
+      
+      <p class="text-xs text-gray-300 leading-relaxed">
+        Por defecto el juego se guarda en la memoria del navegador. Para habilitar que <strong>pibes y pibas jueguen juntos</strong> en diferentes dispositivos y compartan la tabla, seguí esta jugada:
+      </p>
+
+      <ol class="list-decimal list-inside text-xs text-gray-300 space-y-2.5 bg-black/30 p-4 rounded-xl border border-zinc-800">
+        <li>Entrá a la consola de <a href="https://console.firebase.google.com" target="_blank" class="text-sky-400 hover:underline font-black">Firebase Console</a> y creá un proyecto gratuito.</li>
+        <li>Habilitá <strong>Firestore Database</strong> en modo prueba.</li>
+        <li>Habilitá <strong>Authentication</strong> y activá la opción "Anónimo" (Anonymous).</li>
+        <li>Registrá tu App Web y copia el objeto <code class="bg-zinc-800 px-1 rounded text-yellow-300">firebaseConfig</code>.</li>
+        <li>Abrí este archivo <code class="bg-zinc-800 px-1 rounded text-yellow-300">index.html</code> en tu editor de código y poné tus credenciales en la variable <code class="bg-zinc-800 px-1 rounded text-yellow-300">customFirebaseConfig</code> al inicio del script.</li>
+      </ol>
+
+      <div class="pt-2 text-right">
+        <button onclick="closeCloudConfigModal()" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-xl">
+          ¡ENTENDIDO, CRACK!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerta / Mensajes Personalizados -->
+  <div id="custom-alert" class="fixed bottom-6 right-6 bg-emerald-950 border-2 border-emerald-400 p-4 rounded-xl shadow-2xl z-50 hidden max-w-sm">
+    <div class="flex items-start gap-3">
+      <span id="alert-icon" class="text-2xl">📢</span>
+      <div>
+        <p id="alert-message" class="text-xs md:text-sm font-semibold text-gray-100"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie de página -->
+  <footer class="bg-black/80 text-xs text-gray-500 text-center py-4 border-t border-emerald-500/10 mt-8">
+    <p>© 2026 Tense Cup - Hecho para aprender inglés jugando. ¡Mucha suerte en tu examen de Mixed Tenses! 🇦🇷🎓</p>
+  </footer>
+
+  <!-- LÓGICA COMPLETA DEL JUEGO CON INTEGRACIÓN NUBE (FIRESTORE) -->
+  <script type="module">
+    // --- INTEGRACIÓN FIREBASE (SOPORTE DE NUBE PARA AMIGOS) ---
+    const customFirebaseConfig = {
+      apiKey: "AIzaSyBdJKrX2JCGgvCPAxrtnYGADeU2f3ifYdU",
+  authDomain: "tenses-album.firebaseapp.com",
+  projectId: "tenses-album",
+  storageBucket: "tenses-album.firebasestorage.app",
+  messagingSenderId: "330006805562",
+  appId: "1:330006805562:web:a4230111f7a4fea69b8903"
+    };
+
+    // Firebase Module Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    let db = null;
+    let auth = null;
+    let isCloudEnabled = false;
+    let currentAuthUser = null;
+
+    // Inicializar Firebase
+    function initFirebase() {
+      let finalConfig = null;
+      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try {
+          finalConfig = JSON.parse(__firebase_config);
+        } catch(e) {}
+      } else if (customFirebaseConfig.apiKey) {
+        finalConfig = customFirebaseConfig;
+      }
+
+      if (finalConfig) {
+        try {
+          const app = initializeApp(finalConfig);
+          auth = getAuth(app);
+          db = getFirestore(app);
+          isCloudEnabled = true;
+          document.getElementById('cloud-success-banner').classList.remove('hidden');
+          document.getElementById('cloud-status-banner').classList.add('hidden');
+          
+          signInAnonymously(auth).then(() => {
+            onAuthStateChanged(auth, (user) => {
+              currentAuthUser = user;
+              if (user) {
+                const activeName = localStorage.getItem('tense_cup_2026_active_profile');
+                if (activeName) {
+                  loadProfileData(activeName);
+                }
+              }
+            });
+          }).catch(err => {
+            console.warn("Fallo en auth anónimo:", err);
+            isCloudEnabled = false;
+            fallbackToLocalMode();
+          });
+        } catch (e) {
+          console.warn("Fallo inicializando Firebase.", e);
+          fallbackToLocalMode();
+        }
+      } else {
+        fallbackToLocalMode();
+      }
+    }
+
+    function fallbackToLocalMode() {
+      isCloudEnabled = false;
+      document.getElementById('cloud-status-banner').classList.remove('hidden');
+      document.getElementById('cloud-success-banner').classList.add('hidden');
+      
+      const activeName = localStorage.getItem('tense_cup_2026_active_profile');
+      if (activeName) {
+        loadProfileData(activeName);
+      }
+    }
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'tense-cup-2026';
+
+    // --- BASE DE DATOS DE 50 JUGADORES DEL MUNDIAL 2026 ---
+    // Actualizado con URLs directas de alta calidad de Wikimedia Commons para los cracks y leyendas.
+    const PLAYERS = [
+      // CATEGORÍA: ARGENTINA (1-15)
+      { id: 1, name: "Lionel Messi", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 96, stats: [90, 97, 95, 96, 40, 68], hair: "marrón corto", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/220px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg" },
+      { id: 2, name: "Emiliano Martínez", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "POR", ovr: 92, stats: [88, 90, 85, 93, 45, 89], hair: "corto rapado", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emiliano_Mart%C3%ADnez_Qatar_2022.jpg/220px-Emiliano_Mart%C3%ADnez_Qatar_2022.jpg" },
+      { id: 3, name: "Julián Álvarez", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 90, stats: [89, 91, 83, 86, 52, 85], hair: "marrón clásico", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Julian_Alvarez_2022.jpg/220px-Julian_Alvarez_2022.jpg" },
+      { id: 4, name: "Alexis Mac Allister", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "MED", ovr: 89, stats: [80, 85, 91, 88, 75, 80], hair: "colorado corto", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Alexis_Mac_Allister_2022.jpg/220px-Alexis_Mac_Allister_2022.jpg" },
+      { id: 5, name: "Enzo Fernández", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "MED", ovr: 88, stats: [79, 82, 90, 86, 78, 81], hair: "rubio teñido", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Enzo_Fern%C3%A1ndez_Qatar_2022.jpg/220px-Enzo_Fern%C3%A1ndez_Qatar_2022.jpg" },
+      { id: 6, name: "Lautaro Martínez", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 91, stats: [85, 92, 75, 84, 48, 88], hair: "cresta morocha", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Lautaro_Mart%C3%ADnez_2022.jpg/220px-Lautaro_Mart%C3%ADnez_2022.jpg" },
+      { id: 7, name: "Rodrigo De Paul", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "MED", ovr: 87, stats: [82, 78, 84, 83, 76, 89], hair: "rapado platinado", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Rodrigo_De_Paul_Qatar_2022.jpg/220px-Rodrigo_De_Paul_Qatar_2022.jpg" },
+      { id: 8, name: "Cristian Romero", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEF", ovr: 90, stats: [83, 55, 72, 78, 92, 91], hair: "corto negro", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Cristian_Romero_2022.jpg/220px-Cristian_Romero_2022.jpg" },
+      { id: 9, name: "Lisandro Martínez", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEF", ovr: 88, stats: [81, 60, 80, 82, 89, 86], hair: "morocho corto", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Lisandro_Mart%C3%ADnez_2022.jpg/220px-Lisandro_Mart%C3%ADnez_2022.jpg" },
+      { id: 10, name: "Alejandro Garnacho", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 85, stats: [93, 80, 78, 86, 35, 70], hair: "cresta platinada", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Alejandro_Garnacho_2023.jpg/220px-Alejandro_Garnacho_2023.jpg" },
+      { id: 11, name: "Nahuel Molina", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEF", ovr: 84, stats: [87, 68, 79, 80, 80, 78], hair: "morocho", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Nahuel_Molina_Qatar_2022.jpg/220px-Nahuel_Molina_Qatar_2022.jpg" },
+      { id: 12, name: "Nicolás Tagliafico", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEF", ovr: 83, stats: [80, 62, 75, 78, 82, 81], hair: "corto castaño", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Nicol%C3%A1s_Tagliafico_Qatar_2022.jpg/220px-Nicol%C3%A1s_Tagliafico_Qatar_2022.jpg" },
+      { id: 13, name: "Paulo Dybala", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DEL", ovr: 86, stats: [84, 88, 87, 90, 40, 65], hair: "peinado jopo", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Paulo_Dybala_Qatar_2022.jpg/220px-Paulo_Dybala_Qatar_2022.jpg" },
+      { id: 14, name: "Leandro Paredes", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "MED", ovr: 84, stats: [72, 79, 85, 81, 79, 82], hair: "castaño corto", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Leandro_Paredes_Qatar_2022.jpg/220px-Leandro_Paredes_Qatar_2022.jpg" },
+      { id: 15, name: "Lionel Scaloni", country: "Argentina", emoji: "🇦🇷", category: "argentina", pos: "DT", ovr: 95, stats: [90, 92, 95, 96, 94, 95], hair: "corto peinado", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Lionel_Scaloni_Qatar_2022.jpg/220px-Lionel_Scaloni_Qatar_2022.jpg" },
+
+      // CATEGORÍA: ESTRELLAS MUNDIALES (16-30)
+      { id: 16, name: "Kylian Mbappé", country: "Francia", emoji: "🇫🇷", category: "stars", pos: "DEL", ovr: 95, stats: [98, 94, 83, 93, 42, 82], hair: "rapado", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Kylian_Mbapp%C3%A9_V_Moldova.jpg/220px-Kylian_Mbapp%C3%A9_V_Moldova.jpg" },
+      { id: 17, name: "Erling Haaland", country: "Noruega", emoji: "🇳🇴", category: "stars", pos: "DEL", ovr: 94, stats: [90, 96, 68, 81, 45, 91], hair: "rodete rubio", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Erling_Haaland_2023.jpg/220px-Erling_Haaland_2023.jpg" },
+      { id: 18, name: "Vinícius Jr.", country: "Brasil", emoji: "🇧🇷", category: "stars", pos: "DEL", ovr: 93, stats: [97, 88, 84, 94, 38, 79], hair: "rasta corta", skin: "#5c3818", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Vinicius_Junior_2018.jpg/220px-Vinicius_Junior_2018.jpg" },
+      { id: 19, name: "Jude Bellingham", country: "Inglaterra", emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", category: "stars", pos: "MED", ovr: 92, stats: [84, 87, 89, 90, 81, 88], hair: "afro corto", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Jude_Bellingham_2024.jpg/220px-Jude_Bellingham_2024.jpg" },
+      { id: 20, name: "Jamal Musiala", country: "Alemania", emoji: "🇩🇪", category: "stars", pos: "MED", ovr: 90, stats: [88, 83, 85, 94, 62, 74], hair: "rulitos castaños", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Jamal_Musiala_Euro_2024_%28cropped%29.jpg/220px-Jamal_Musiala_Euro_2024_%28cropped%29.jpg" },
+      { id: 21, name: "Kevin De Bruyne", country: "Bélgica", emoji: "🇧🇪", category: "stars", pos: "MED", ovr: 92, stats: [76, 88, 94, 87, 65, 78], hair: "rubio clásico", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Kevin_De_Bruyne_Euro_2024.jpg/220px-Kevin_De_Bruyne_Euro_2024.jpg" },
+      { id: 22, name: "Harry Kane", country: "Inglaterra", emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", category: "stars", pos: "DEL", ovr: 91, stats: [72, 94, 85, 83, 47, 83], hair: "castaño clásico", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Harry_Kane_Euro_2024_2.jpg/220px-Harry_Kane_Euro_2024_2.jpg" },
+      { id: 23, name: "Mohamed Salah", country: "Egipto", emoji: "🇪🇬", category: "stars", pos: "DEL", ovr: 90, stats: [91, 88, 83, 89, 45, 76], hair: "afro grande", skin: "#c68642", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Mohamed_Salah_2018.jpg/220px-Mohamed_Salah_2018.jpg" },
+      { id: 24, name: "Robert Lewandowski", country: "Polonia", emoji: "🇵🇱", category: "stars", pos: "DEL", ovr: 89, stats: [77, 91, 79, 85, 43, 82], hair: "corto peinado", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Robert_Lewandowski_Euro_2024.jpg/220px-Robert_Lewandowski_Euro_2024.jpg" },
+      { id: 25, name: "Antoine Griezmann", country: "Francia", emoji: "🇫🇷", category: "stars", pos: "DEL", ovr: 88, stats: [81, 86, 88, 87, 58, 72], hair: "color fantasía", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Antoine_Griezmann_Euro_24.jpg/220px-Antoine_Griezmann_Euro_24.jpg" },
+      { id: 26, name: "Fede Valverde", country: "Uruguay", emoji: "🇺🇾", category: "stars", pos: "MED", ovr: 90, stats: [89, 84, 85, 84, 81, 88], hair: "castaño corto", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Federico_Valverde_2018.jpg/220px-Federico_Valverde_2018.jpg" },
+      { id: 27, name: "Luis Díaz", country: "Colombia", emoji: "🇨🇴", category: "stars", pos: "DEL", ovr: 86, stats: [91, 82, 78, 88, 41, 75], hair: "rulos negros", skin: "#c68642", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Luis_D%C3%ADaz_UCL_Final_2022.jpg/220px-Luis_D%C3%ADaz_UCL_Final_2022.jpg" },
+      { id: 28, name: "Rodri Hernández", country: "España", emoji: "🇪🇸", category: "stars", pos: "MED", ovr: 92, stats: [74, 81, 87, 85, 89, 90], hair: "morocho prolijo", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Rodri_Euro_2024.jpg/220px-Rodri_Euro_2024.jpg" },
+      { id: 29, name: "Alfonso Davies", country: "Canadá", emoji: "🇨🇦", category: "stars", pos: "DEF", ovr: 85, stats: [95, 68, 78, 84, 77, 79], hair: "rapado", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Alphonso_Davies_2021.jpg/220px-Alphonso_Davies_2021.jpg" },
+      { id: 30, name: "Son Heung-min", country: "Corea del Sur", emoji: "🇰🇷", category: "stars", pos: "DEL", ovr: 88, stats: [89, 89, 83, 86, 42, 70], hair: "k-pop negro", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Son_Heung-min_2022.jpg/220px-Son_Heung-min_2022.jpg" },
+
+      // CATEGORÍA: PROMESAS SUB-21 (31-40)
+      { id: 31, name: "Lamine Yamal", country: "España", emoji: "🇪🇸", category: "rookies", pos: "DEL", ovr: 89, stats: [92, 84, 86, 92, 40, 70], hair: "rapado con diseño", skin: "#c68642", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lamine_Yamal_Euro_2024.jpg/220px-Lamine_Yamal_Euro_2024.jpg" },
+      { id: 32, name: "Florian Wirtz", country: "Alemania", emoji: "🇩🇪", category: "rookies", pos: "MED", ovr: 89, stats: [83, 81, 89, 90, 60, 72], hair: "castaño", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Florian_Wirtz_Euro_2024_%28cropped%29.jpg/220px-Florian_Wirtz_Euro_2024_%28cropped%29.jpg" },
+      { id: 33, name: "Endrick", country: "Brasil", emoji: "🇧🇷", category: "rookies", pos: "DEL", ovr: 82, stats: [89, 84, 72, 83, 38, 82], hair: "morocho corto", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Endrick_Valence_2024.jpg/220px-Endrick_Valence_2024.jpg" },
+      { id: 34, name: "Gavi", country: "España", emoji: "🇪🇸", category: "rookies", pos: "MED", ovr: 84, stats: [80, 75, 81, 84, 76, 79], hair: "despeinado", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Gavi_2022.jpg/220px-Gavi_2022.jpg" },
+      { id: 35, name: "Warren Zaïre-Emery", country: "Francia", emoji: "🇫🇷", category: "rookies", pos: "MED", ovr: 83, stats: [82, 76, 81, 82, 78, 82], hair: "afro bajo", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Warren_Za%C3%AFre-Emery_2023.jpg/220px-Warren_Za%C3%AFre-Emery_2023.jpg" },
+      { id: 36, name: "Claudio Echeverri", country: "Argentina", emoji: "🇦🇷", category: "rookies", pos: "MED", ovr: 80, stats: [85, 75, 81, 84, 40, 62], hair: "lacio corto", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Claudio_Echeverri_2023.jpg/220px-Claudio_Echeverri_2023.jpg" },
+      { id: 37, name: "Kobbie Mainoo", country: "Inglaterra", emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", category: "rookies", pos: "MED", ovr: 82, stats: [78, 72, 80, 83, 75, 78], hair: "rasta corta", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Kobbie_Mainoo_Euro_2024.jpg/220px-Kobbie_Mainoo_Euro_2024.jpg" },
+      { id: 38, name: "Franco Mastantuono", country: "Argentina", emoji: "🇦🇷", category: "rookies", pos: "MED", ovr: 79, stats: [82, 77, 80, 82, 42, 65], hair: "peinado clásico", skin: "#ffe3c6", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Franco_Mastantuono_2023.jpg/220px-Franco_Mastantuono_2023.jpg" },
+      { id: 39, name: "Mathys Tel", country: "Francia", emoji: "🇫🇷", category: "rookies", pos: "DEL", ovr: 80, stats: [88, 79, 72, 81, 35, 74], hair: "rapado", skin: "#8d5524", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Mathys_Tel_2023.jpg/220px-Mathys_Tel_2023.jpg" },
+      { id: 40, name: "Arda Güler", country: "Turquía", emoji: "🇹🇷", category: "rookies", pos: "MED", ovr: 81, stats: [81, 79, 83, 85, 45, 65], hair: "castaño despeinado", skin: "#ffd1a4", legend: false, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Arda_G%C3%BCler_2023.jpg/220px-Arda_G%C3%BCler_2023.jpg" },
+
+      // CATEGORÍA: LEYENDAS HISTÓRICAS (41-50) (DORADAS)
+      { id: 41, name: "Diego Maradona", country: "Argentina", emoji: "🇦🇷", category: "legends", pos: "DEL", ovr: 98, stats: [92, 96, 97, 99, 44, 79], hair: "rulos negros retro", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona_by_El_Gr%C3%A1fico.jpg/220px-Maradona_by_El_Gr%C3%A1fico.jpg" },
+      { id: 42, name: "Pelé", country: "Brasil", emoji: "🇧🇷", category: "legends", pos: "DEL", ovr: 98, stats: [95, 96, 93, 96, 40, 85], hair: "afro retro", skin: "#5c3818", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Pele_1970.jpg/220px-Pele_1970.jpg" },
+      { id: 43, name: "Zinedine Zidane", country: "Francia", emoji: "🇫🇷", category: "legends", pos: "MED", ovr: 96, stats: [83, 88, 96, 95, 70, 84], hair: "calvo retro", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_01.jpg/220px-Zinedine_Zidane_by_Tasnim_01.jpg" },
+      { id: 44, name: "Johan Cruyff", country: "Países Bajos", emoji: "🇳🇱", category: "legends", pos: "DEL", ovr: 96, stats: [91, 92, 94, 96, 42, 78], hair: "lacio castaño largo", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Johan_Cruyff_1974.jpg/220px-Johan_Cruyff_1974.jpg" },
+      { id: 45, name: "Ronaldinho", country: "Brasil", emoji: "🇧🇷", category: "legends", pos: "DEL", ovr: 95, stats: [92, 89, 91, 97, 35, 79], hair: "pelo largo bincha", skin: "#8d5524", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Ronaldinho_11feb2009.jpg/220px-Ronaldinho_11feb2009.jpg" },
+      { id: 46, name: "Ronaldo Nazário", country: "Brasil", emoji: "🇧🇷", category: "legends", pos: "DEL", ovr: 97, stats: [97, 95, 80, 95, 40, 88], hair: "rapado", skin: "#8d5524", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Ronaldo_Nazario_2018.jpg/220px-Ronaldo_Nazario_2018.jpg" },
+      { id: 47, name: "Cristiano Ronaldo", country: "Portugal", emoji: "🇵🇹", category: "legends", pos: "DEL", ovr: 94, stats: [88, 94, 80, 86, 40, 87], hair: "peinado gel", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Persepolis_FC_at_the_Azadi_Stadium%21.jpg/220px-Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Persepolis_FC_at_the_Azadi_Stadium%21.jpg" },
+      { id: 48, name: "Andrés Iniesta", country: "España", emoji: "🇪🇸", category: "legends", pos: "MED", ovr: 93, stats: [79, 80, 94, 91, 68, 70], hair: "calvo sides", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Andr%C3%A9s_Iniesta_2018.jpg/220px-Andr%C3%A9s_Iniesta_2018.jpg" },
+      { id: 49, name: "Ángel Di María", country: "Argentina", emoji: "🇦🇷", category: "legends", pos: "DEL", ovr: 91, stats: [88, 86, 89, 90, 48, 70], hair: "corto morocho", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/%C3%81ngel_Di_Mar%C3%ADa_Qatar_2022.jpg/220px-%C3%81ngel_Di_Mar%C3%ADa_Qatar_2022.jpg" },
+      { id: 50, name: "Gabriel Batistuta", country: "Argentina", emoji: "🇦🇷", category: "legends", pos: "DEL", ovr: 92, stats: [85, 94, 75, 80, 42, 90], hair: "largo rubio retro", skin: "#ffd1a4", legend: true, photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Gabriel_Batistuta_as_Fiorentina_player.jpg/220px-Gabriel_Batistuta_as_Fiorentina_player.jpg" }
+    ];
+
+    // --- SELECCION DE IDOLOS ARGENTINOS PARA EL REGISTRO ---
+    const AVATAR_PLAYERS = [
+      { id: "messi", emoji: "🐐", name: "Messi", role: "El Capitán", code: "MES", jersey: "10" },
+      { id: "dibu", emoji: "🧤", name: "Dibu", role: "El Murallón", code: "DIB", jersey: "23" },
+      { id: "julian", emoji: "🕷️", name: "Julián", role: "La Araña", code: "JUL", jersey: "9" },
+      { id: "garnacho", emoji: "⚡", name: "Garnacho", role: "El Rayo", code: "GAR", jersey: "17" },
+      { id: "cuti", emoji: "🛡️", name: "Cuti", role: "El Caimán", code: "CUT", jersey: "13" }
+    ];
+    let selectedAvatarIndex = 0;
+
+    // --- ESTADO LOCAL DEL JUGADOR ACTIVO ---
+    let activeNickname = "";
+    let gameState = {
+      nickname: "",
+      avatarTeam: "MES", 
+      coins: 150,
+      collectedIds: [],
+      repeats: {},
+      unlockedDays: [1],
+      completedDays: [],
+      openedPacks: 0,
+      lastActiveDay: 1
+    };
+
+    // --- MODALES PERSONALIZADOS ---
+    function customConfirm(message, yesLabel = "Confirmar", noLabel = "Cancelar", onYes) {
+      playSound('click');
+      const modal = document.getElementById('confirm-modal');
+      document.getElementById('confirm-message').innerText = message;
+      
+      const yesBtn = document.getElementById('btn-confirm-yes');
+      const noBtn = document.getElementById('btn-confirm-no');
+      
+      yesBtn.innerText = yesLabel;
+      noBtn.innerText = noLabel;
+      
+      modal.classList.remove('hidden');
+      
+      yesBtn.onclick = () => {
+        playSound('success');
+        modal.classList.add('hidden');
+        if (onYes) onYes();
+      };
+      
+      noBtn.onclick = () => {
+        playSound('click');
+        modal.classList.add('hidden');
+      };
+    }
+
+    // --- LÓGICA DE LOGIN Y CAMBIO DE PESTAÑAS ---
+    window.switchLoginTab = function(tab) {
+      playSound('click');
+      const tabSignin = document.getElementById('btn-tab-signin');
+      const tabSignup = document.getElementById('btn-tab-signup');
+      const formSignin = document.getElementById('form-signin');
+      const formSignup = document.getElementById('form-signup');
+
+      if (tab === 'signin') {
+        tabSignin.className = "py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 bg-emerald-500 text-black";
+        tabSignup.className = "py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 text-gray-400";
+        formSignin.classList.remove('hidden');
+        formSignup.classList.add('hidden');
+      } else {
+        tabSignup.className = "py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 bg-emerald-500 text-black";
+        tabSignin.className = "py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition duration-200 text-gray-400";
+        formSignup.classList.remove('hidden');
+        formSignin.classList.add('hidden');
+        renderAvatarSelector();
+      }
+    };
+
+    function renderAvatarSelector() {
+      const container = document.getElementById('avatar-selector');
+      container.innerHTML = "";
+      AVATAR_PLAYERS.forEach((team, idx) => {
+        const isSelected = selectedAvatarIndex === idx;
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.onclick = () => selectAvatarTeam(idx);
+        btn.className = `p-2 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition touch-manipulation ${
+          isSelected 
+            ? 'bg-emerald-950/80 border-emerald-400 ring-4 ring-emerald-500/30 text-white' 
+            : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700 text-gray-400'
+        }`;
+        
+        btn.innerHTML = `
+          <span class="text-3xl">${team.emoji}</span>
+          <span class="text-[10px] font-black uppercase tracking-tight">${team.name}</span>
+          <span class="text-[8px] font-bold text-emerald-400">${team.jersey}</span>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    function selectAvatarTeam(idx) {
+      playSound('click');
+      selectedAvatarIndex = idx;
+      renderAvatarSelector();
+    }
+
+    function sanitizeNickname(name) {
+      return name.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    // INGRESAR (SIGN IN)
+    window.handleSignIn = async function(event) {
+      event.preventDefault();
+      playSound('click');
+      const inputName = document.getElementById('signin-nickname').value;
+      const nickId = sanitizeNickname(inputName);
+
+      if (!nickId) {
+        showAlert("¡Por favor ingresá un nombre válido!", "❌");
+        return;
+      }
+
+      setLoginLoading(true);
+
+      if (isCloudEnabled && db) {
+        try {
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            activeNickname = data.nickname;
+            gameState = data;
+            localStorage.setItem('tense_cup_2026_active_profile', nickId);
+            enterGame();
+          } else {
+            showAlert(`El perfil "${inputName}" no se encontró en la nube. ¡Crealo en la pestaña de al lado!`, "❓");
+            setLoginLoading(false);
+          }
+        } catch (e) {
+          console.error(e);
+          showAlert("Hubo un error de conexión con los vestuarios de la nube.", "❌");
+          setLoginLoading(false);
+        }
+      } else {
+        const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        if (savedData) {
+          activeNickname = nickId;
+          gameState = JSON.parse(savedData);
+          localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          enterGame();
+        } else {
+          showAlert(`El perfil local "${inputName}" no existe. ¡Crealo en la solapa de al lado!`, "❓");
+          setLoginLoading(false);
+        }
+      }
+    };
+
+    // REGISTRAR PERFIL NUEVO (SIGN UP)
+    window.handleSignUp = async function(event) {
+      event.preventDefault();
+      playSound('click');
+      const inputName = document.getElementById('signup-nickname').value;
+      const nickId = sanitizeNickname(inputName);
+      const selectedPlayer = AVATAR_PLAYERS[selectedAvatarIndex];
+
+      if (!nickId || nickId.length < 2) {
+        showAlert("Escribí un nombre de al menos 2 letras.", "❌");
+        return;
+      }
+
+      setLoginLoading(true);
+
+      const initialProgress = {
+        nickname: inputName,
+        avatarTeam: selectedPlayer.code,
+        coins: 150,
+        collectedIds: [],
+        repeats: {},
+        unlockedDays: [1],
+        completedDays: [],
+        openedPacks: 0,
+        lastActiveDay: 1,
+        uniquesCount: 0,
+        lastUpdated: new Date().toISOString()
+      };
+
+      if (isCloudEnabled && db) {
+        try {
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            showAlert("¡Ese apodo ya está en uso por otro crack en la tabla! Elegí otro diferente.", "🚫");
+            setLoginLoading(false);
+            return;
+          }
+
+          await setDoc(docRef, initialProgress);
+          
+          activeNickname = inputName;
+          gameState = initialProgress;
+          localStorage.setItem('tense_cup_2026_active_profile', nickId);
+          enterGame();
+        } catch (e) {
+          console.error(e);
+          showAlert("Error al guardar perfil nuevo en la nube.", "❌");
+          setLoginLoading(false);
+        }
+      } else {
+        const existingLocal = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        if (existingLocal) {
+          showAlert("Ese nombre ya existe localmente. Probá ingresando directamente.", "🚫");
+          setLoginLoading(false);
+          return;
+        }
+
+        localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(initialProgress));
+        activeNickname = nickId;
+        gameState = initialProgress;
+        localStorage.setItem('tense_cup_2026_active_profile', nickId);
+        enterGame();
+      }
+    };
+
+    function setLoginLoading(isLoading) {
+      const form1 = document.getElementById('form-signin');
+      const form2 = document.getElementById('form-signup');
+      const loader = document.getElementById('login-loading');
+
+      if (isLoading) {
+        form1.classList.add('hidden');
+        form2.classList.add('hidden');
+        loader.classList.remove('hidden');
+      } else {
+        loader.classList.add('hidden');
+        const isSigninTab = document.getElementById('btn-tab-signin').classList.contains('bg-emerald-500');
+        if (isSigninTab) {
+          form1.classList.remove('hidden');
+        } else {
+          form2.classList.remove('hidden');
+        }
+      }
+    }
+
+    async function loadProfileData(nickId) {
+      if (isCloudEnabled && db) {
+        try {
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            gameState = docSnap.data();
+            activeNickname = gameState.nickname;
+            enterGame();
+          } else {
+            fallbackToLocalMode();
+          }
+        } catch(e) {
+          fallbackToLocalMode();
+        }
+      } else {
+        const savedData = localStorage.getItem(`tense_cup_2026_profile_${nickId}`);
+        if (savedData) {
+          gameState = JSON.parse(savedData);
+          activeNickname = gameState.nickname;
+          enterGame();
+        }
+      }
+    }
+
+    function enterGame() {
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('main-navigation').classList.remove('hidden');
+      
+      const badge = document.getElementById('user-badge');
+      const avatarIcon = document.getElementById('user-avatar-icon');
+      const nameDisplay = document.getElementById('user-name-display');
+
+      const hero = AVATAR_PLAYERS.find(t => t.code === gameState.avatarTeam) || AVATAR_PLAYERS[0];
+      avatarIcon.innerText = hero.emoji;
+      nameDisplay.innerText = gameState.nickname;
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
+
+      updateUI();
+      switchView('train');
+      showAlert(`¡Bienvenido/a al vestuario, crack ${gameState.nickname}! ⚽`, "🏆");
+    }
+
+    window.logoutProfile = function() {
+      customConfirm("¿Querés cerrar tu sesión para entrar con otro perfil?", "Salir", "Quedarme", () => {
+        localStorage.removeItem('tense_cup_2026_active_profile');
+        activeNickname = "";
+        
+        document.getElementById('user-badge').classList.add('hidden');
+        document.getElementById('user-badge').classList.remove('flex');
+        document.getElementById('main-navigation').classList.add('hidden');
+        document.getElementById('view-train').classList.add('hidden');
+        document.getElementById('view-album').classList.add('hidden');
+        document.getElementById('view-shop').classList.add('hidden');
+        document.getElementById('view-friends').classList.add('hidden');
+        document.getElementById('day-panel').classList.add('hidden');
+
+        setLoginLoading(false);
+        document.getElementById('view-login').classList.remove('hidden');
+        switchLoginTab('signin');
+      });
+    };
+
+    // --- PERSISTENCIA Y GUARDADO GENERAL ---
+    async function saveGame() {
+      if (!activeNickname) return;
+      
+      const nickId = sanitizeNickname(activeNickname);
+      gameState.uniquesCount = gameState.collectedIds ? gameState.collectedIds.length : 0;
+      gameState.lastUpdated = new Date().toISOString();
+
+      if (isCloudEnabled && db && auth.currentUser) {
+        try {
+          const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', nickId);
+          await setDoc(docRef, gameState);
+        } catch(e) {
+          console.error("Error guardando en la nube:", e);
+        }
+      } else {
+        localStorage.setItem(`tense_cup_2026_profile_${nickId}`, JSON.stringify(gameState));
+      }
+      
+      updateUI();
+    }
+
+    window.confirmReset = function() {
+      customConfirm("¿Querés borrar todo el progreso de tu álbum virtual? Esto no se puede revertir.", "Borrar Todo", "Cancelar", () => {
+        gameState.coins = 150;
+        gameState.collectedIds = [];
+        gameState.repeats = {};
+        gameState.unlockedDays = [1];
+        gameState.completedDays = [];
+        gameState.openedPacks = 0;
+        gameState.lastActiveDay = 1;
+        gameState.uniquesCount = 0;
+        saveGame();
+        switchView('train');
+        showAlert("🏆 Álbum vacío. ¡A meterle garra en esta nueva campaña!", "🔥");
+      });
+    };
+
+    function showAlert(message, icon = "📢") {
+      const alertBox = document.getElementById('custom-alert');
+      document.getElementById('alert-message').innerHTML = message;
+      document.getElementById('alert-icon').innerText = icon;
+      alertBox.classList.remove('hidden');
+      setTimeout(() => {
+        alertBox.classList.add('hidden');
+      }, 5000);
+    }
+
+    // --- MANEJO DE VISTAS (Navegación) ---
+    window.switchView = function(view) {
+      playSound('click');
+      document.getElementById('view-train').classList.add('hidden');
+      document.getElementById('view-album').classList.add('hidden');
+      document.getElementById('view-shop').classList.add('hidden');
+      document.getElementById('view-friends').classList.add('hidden');
+      
+      document.getElementById('nav-train').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-emerald-950/40 border-emerald-500/20 text-gray-300 touch-manipulation";
+      document.getElementById('nav-album').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-emerald-950/40 border-emerald-500/20 text-gray-300 touch-manipulation";
+      document.getElementById('nav-shop').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-emerald-950/40 border-emerald-500/20 text-gray-300 touch-manipulation";
+      document.getElementById('nav-friends').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-emerald-950/40 border-emerald-500/20 text-gray-300 touch-manipulation";
+
+      if (view === 'train') {
+        document.getElementById('view-train').classList.remove('hidden');
+        document.getElementById('nav-train').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-gradient-to-tr from-emerald-500 to-teal-500 border-emerald-400 text-black shadow-lg touch-manipulation";
+        renderDaysGrid();
+      } else if (view === 'album') {
+        document.getElementById('view-album').classList.remove('hidden');
+        document.getElementById('nav-album').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-gradient-to-tr from-emerald-500 to-teal-500 border-emerald-400 text-black shadow-lg touch-manipulation";
+        renderAlbumGrid();
+      } else if (view === 'shop') {
+        document.getElementById('view-shop').classList.remove('hidden');
+        document.getElementById('nav-shop').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-gradient-to-tr from-emerald-500 to-teal-500 border-emerald-400 text-black shadow-lg touch-manipulation";
+        resetOpener();
+      } else if (view === 'friends') {
+        document.getElementById('view-friends').classList.remove('hidden');
+        document.getElementById('nav-friends').className = "py-3 px-1 rounded-xl font-black text-xs transition duration-300 flex flex-col items-center justify-center gap-1 bg-gradient-to-tr from-emerald-500 to-teal-500 border-emerald-400 text-black shadow-lg touch-manipulation";
+        loadFriendsLeaderboard();
+      }
+    };
+
+    function updateUI() {
+      if (!gameState) return;
+      document.getElementById('header-coins').innerText = gameState.coins;
+      document.getElementById('shop-coins-val').innerText = gameState.coins;
+
+      const uniquesCount = gameState.collectedIds ? gameState.collectedIds.length : 0;
+      document.getElementById('header-album-progress').innerText = `${uniquesCount}/50`;
+
+      const statsUniques = document.getElementById('stats-uniques');
+      if (statsUniques) statsUniques.innerText = `${uniquesCount} / 50`;
+
+      let totalRepeats = 0;
+      if (gameState.repeats) {
+        Object.keys(gameState.repeats).forEach(id => {
+          totalRepeats += gameState.repeats[id];
+        });
+      }
+      const statsRepeats = document.getElementById('stats-repeats');
+      if (statsRepeats) statsRepeats.innerText = totalRepeats;
+
+      const statsOpened = document.getElementById('stats-opened');
+      if (statsOpened) statsOpened.innerText = gameState.openedPacks || 0;
+
+      const statsPercent = document.getElementById('stats-percent');
+      if (statsPercent) statsPercent.innerText = `${Math.round((uniquesCount / 50) * 100)}%`;
+
+      const completedCount = gameState.completedDays ? gameState.completedDays.length : 0;
+      document.getElementById('training-progress-header').innerText = `Entrenamientos completados: ${completedCount} / 10`;
+    }
+
+    // --- SECCIÓN: ENTRENAMIENTO (DÍAS DE TRIVIA) ---
+    function renderDaysGrid() {
+      const grid = document.getElementById('days-grid');
+      grid.innerHTML = "";
+      
+      for (let d = 1; d <= 10; d++) {
+        const isUnlocked = gameState.unlockedDays.includes(d);
+        const isCompleted = gameState.completedDays.includes(d);
+        const isSelected = gameState.lastActiveDay === d;
+
+        let bgClass = "bg-zinc-900 border-zinc-800 text-gray-500 cursor-not-allowed";
+        if (isUnlocked) {
+          bgClass = "bg-emerald-900/40 border-emerald-700/50 text-emerald-200 hover:bg-emerald-900/60 cursor-pointer";
+        }
+        if (isCompleted) {
+          bgClass = "bg-gradient-to-tr from-emerald-950 to-emerald-800 border-yellow-500/50 text-yellow-300 hover:from-emerald-900 cursor-pointer";
+        }
+
+        const borderGlow = isSelected && isUnlocked ? "ring-2 ring-yellow-400" : "";
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border flex flex-col items-center justify-between text-center relative ${bgClass} ${borderGlow} transition duration-200 touch-manipulation`;
+        card.innerHTML = `
+          <div class="text-[10px] uppercase tracking-wider font-extrabold text-gray-400">Día</div>
+          <div class="text-3xl font-black italic my-1">${d}</div>
+          <div class="text-[9px] font-bold uppercase tracking-wider">
+            ${isCompleted ? '⭐ Al ángulo' : (isUnlocked ? '🔓 Listo' : '🔒 Esperá')}
+          </div>
+          ${isUnlocked ? `<button id="btn-select-day-${d}" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer touch-manipulation"></button>` : ''}
+        `;
+        grid.appendChild(card);
+
+        const btn = card.querySelector(`#btn-select-day-${d}`);
+        if (btn) {
+          btn.addEventListener('click', (e) => selectDay(d, e));
+        }
+      }
+
+      if (gameState.lastActiveDay) {
+        loadDayDetail(gameState.lastActiveDay);
+      }
+    }
+
+    function selectDay(dayNum, event) {
+      if (event) event.preventDefault();
+      playSound('click');
+      gameState.lastActiveDay = dayNum;
+      saveGame();
+      renderDaysGrid();
+    }
+
+    let currentTriviaDay = null;
+    let currentQuestionIndex = 0;
+    let tempTriviaScore = 0;
+    let selectedAnswer = null;
+    let isQuestionAnswered = false; 
+
+    function loadDayDetail(dayNum) {
+      const dayData = DAYS_DATA[dayNum];
+      if (!dayData) return;
+
+      currentTriviaDay = dayNum;
+      const panel = document.getElementById('day-panel');
+      panel.classList.remove('hidden');
+
+      const introDiv = document.getElementById('day-intro');
+      const isCompleted = gameState.completedDays.includes(dayNum);
+
+      introDiv.innerHTML = `
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <span class="text-[10px] font-black text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2.5 py-1 rounded-md border border-yellow-400/20">Charla Técnica Oficial</span>
+            <h3 class="text-xl md:text-2xl font-black text-white mt-2">${dayData.title}</h3>
+          </div>
+          <div class="bg-yellow-500/10 border border-yellow-500/30 p-2.5 rounded-2xl text-center min-w-[120px] self-stretch sm:self-auto flex sm:flex-col justify-between items-center sm:justify-center">
+            <span class="text-[10px] text-gray-400 font-bold uppercase">Premio por ganar</span>
+            <span class="font-extrabold text-yellow-400 text-lg">🪙 ${dayData.reward}</span>
+          </div>
+        </div>
+
+        <div class="mt-4 text-gray-300 text-sm leading-relaxed space-y-3 bg-black/20 p-4 rounded-xl border border-emerald-500/10">
+          <p>${dayData.desc}</p>
+          <div class="bg-emerald-500/10 border-l-4 border-emerald-400 p-3 text-xs italic text-emerald-300">
+            ${dayData.tip}
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <button id="btn-start-trivia" class="flex-grow bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/20 text-center transition uppercase text-xs tracking-wider">
+            ${isCompleted ? '⚽ Volver a Jugar (Ganás menos monedas)' : '⚽ Salir a jugar el entrenamiento'}
+          </button>
+        </div>
+      `;
+
+      document.getElementById('btn-start-trivia').addEventListener('click', () => startTrivia(dayNum));
+      document.getElementById('day-trivia').classList.add('hidden');
+    }
+
+    function startTrivia(dayNum) {
+      playSound('click');
+      currentQuestionIndex = 0;
+      tempTriviaScore = 0;
+      selectedAnswer = null;
+
+      const triviaDiv = document.getElementById('day-trivia');
+      triviaDiv.classList.remove('hidden');
+      triviaDiv.scrollIntoView({ behavior: 'smooth' });
+
+      renderTriviaQuestion();
+    }
+
+    function renderTriviaQuestion() {
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      const triviaDiv = document.getElementById('day-trivia');
+
+      selectedAnswer = null;
+      isQuestionAnswered = false; 
+
+      triviaDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Jugada ${currentQuestionIndex + 1} de 5</span>
+          <div class="h-2 w-32 bg-zinc-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-400" style="width: ${(currentQuestionIndex + 1) * 20}%"></div>
+          </div>
+        </div>
+
+        <h4 class="text-base md:text-lg font-bold text-white mb-6 leading-snug bg-emerald-950/60 p-4 rounded-xl border border-emerald-500/20">${qData.q}</h4>
+
+        <div class="grid gap-3" id="options-container">
+          ${qData.options.map((opt, idx) => `
+            <button id="opt-${idx}" class="w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between touch-manipulation">
+              <span>${opt}</span>
+              <span class="text-xs opacity-0" id="badge-${idx}">⚽</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div id="trivia-feedback" class="text-xs font-semibold text-gray-300 hidden sm:max-w-[70%]"></div>
+          <button id="btn-submit-ans" disabled class="w-full sm:w-auto bg-yellow-500 disabled:opacity-50 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl transition shadow-lg shadow-yellow-500/10 uppercase text-xs tracking-wider touch-manipulation">
+            Patear al Arco
+          </button>
+        </div>
+      `;
+
+      // Event listeners para opciones
+      qData.options.forEach((_, idx) => {
+        document.getElementById(`opt-${idx}`).addEventListener('click', () => selectOption(idx));
+      });
+
+      document.getElementById('btn-submit-ans').addEventListener('click', submitAnswer);
+    }
+
+    function selectOption(idx) {
+      playSound('click');
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      
+      if (isQuestionAnswered) {
+        return; 
+      }
+
+      for (let i = 0; i < qData.options.length; i++) {
+        const btn = document.getElementById(`opt-${i}`);
+        const badge = document.getElementById(`badge-${i}`);
+        btn.className = "w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between";
+        badge.classList.add('opacity-0');
+      }
+
+      const activeBtn = document.getElementById(`opt-${idx}`);
+      const activeBadge = document.getElementById(`badge-${idx}`);
+      activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-950 border-2 border-emerald-500 font-semibold text-sm md:text-base flex items-center justify-between text-emerald-300";
+      activeBadge.classList.remove('opacity-0');
+
+      selectedAnswer = idx;
+      document.getElementById('btn-submit-ans').disabled = false;
+    }
+
+    // El motor booleano garantiza que el flujo de preguntas sea inmune a la capitalización de texto de Tailwind.
+    function submitAnswer() {
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const qData = dayData.questions[currentQuestionIndex];
+      const btn = document.getElementById('btn-submit-ans');
+
+      if (isQuestionAnswered) {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 5) {
+          renderTriviaQuestion();
+        } else {
+          finishTrivia();
+        }
+        return;
+      }
+
+      const feedbackDiv = document.getElementById('trivia-feedback');
+      feedbackDiv.classList.remove('hidden');
+
+      const isCorrect = selectedAnswer === qData.correct;
+
+      for (let i = 0; i < qData.options.length; i++) {
+        document.getElementById(`opt-${i}`).disabled = true;
+      }
+
+      if (isCorrect) {
+        playSound('success');
+        tempTriviaScore++;
+        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
+        activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
+        feedbackDiv.className = "text-sm font-black text-emerald-400 max-w-[70%] flex items-center gap-2";
+        feedbackDiv.innerHTML = "<span>⚽ ¡GOLAZO! ¡La clavaste al ángulo, crack!</span>";
+      } else {
+        playSound('wrong');
+        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
+        if (activeBtn) activeBtn.className = "w-full text-left p-4 rounded-xl bg-red-600 text-white font-semibold text-sm md:text-base flex items-center justify-between";
+        
+        const correctBtn = document.getElementById(`opt-${qData.correct}`);
+        correctBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
+        
+        feedbackDiv.className = "text-xs font-semibold text-red-300 bg-red-950/40 p-3 rounded-lg border border-red-500/20 max-w-[70%]";
+        feedbackDiv.innerHTML = `<strong>¡Uyyy, al palo!</strong> Fijate: ${qData.reason}`;
+      }
+
+      isQuestionAnswered = true;
+      
+      if (currentQuestionIndex < 4) {
+        btn.innerText = "Siguiente Jugada ➡️";
+      } else {
+        btn.innerText = "Terminar Partido 🏆";
+      }
+      btn.disabled = false;
+    }
+
+    function finishTrivia() {
+      playSound('success');
+      const dayData = DAYS_DATA[currentTriviaDay];
+      const isAlreadyCompleted = gameState.completedDays.includes(currentTriviaDay);
+      
+      let earned = 0;
+      if (!isAlreadyCompleted) {
+        earned = dayData.reward;
+        gameState.completedDays.push(currentTriviaDay);
+        const nextDay = currentTriviaDay + 1;
+        if (nextDay <= 10 && !gameState.unlockedDays.includes(nextDay)) {
+          gameState.unlockedDays.push(nextDay);
+        }
+      } else {
+        earned = Math.round(dayData.reward * 0.3); 
+      }
+
+      gameState.coins += earned;
+      saveGame();
+
+      const triviaDiv = document.getElementById('day-trivia');
+      let titleMsg = "¡Final del partido! Gran victoria ⚽";
+      let starsEmoji = "⭐⭐⭐";
+      if (tempTriviaScore === 5) {
+        titleMsg = "🏆 ¡PARTIDO PERFECTO! ¡SOS LEYENDA DEL POTRERO!";
+        starsEmoji = "⭐⭐⭐⭐⭐";
+      } else if (tempTriviaScore >= 3) {
+        starsEmoji = "⭐⭐⭐⭐";
+      }
+
+      triviaDiv.innerHTML = `
+        <div class="text-center py-6 space-y-4">
+          <div class="text-5xl animate-bounce">🏆</div>
+          <h4 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">${titleMsg}</h4>
+          <p class="text-yellow-400 font-extrabold text-xl tracking-widest">${starsEmoji}</p>
+          <p class="text-sm text-gray-300 max-w-md mx-auto">
+            Metiste <strong>${tempTriviaScore} de 5 golazos</strong> correctos. ¡Se nota ese entrenamiento diario!
+          </p>
+
+          <div class="inline-flex items-center gap-3 bg-yellow-500/20 border border-yellow-500/50 p-4 rounded-2xl">
+            <span class="text-3xl">🪙</span>
+            <div class="text-left">
+              <span class="text-[10px] text-gray-400 font-bold block leading-none">RECOMPENSA</span>
+              <span class="text-2xl font-black text-yellow-400">+ ${earned} Monedas</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-col sm:flex-row justify-center gap-3">
+            <button id="btn-res-shop" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-3.5 px-6 rounded-xl transition shadow-lg shadow-yellow-500/20 uppercase text-xs tracking-wider">
+              🛍️ Ir al Kiosquero a comprar sobres
+            </button>
+            <button id="btn-res-calendar" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black py-3.5 px-6 rounded-xl transition uppercase text-xs tracking-wider">
+              📅 Volver al fixture
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('btn-res-shop').addEventListener('click', () => switchView('shop'));
+      document.getElementById('btn-res-calendar').addEventListener('click', () => switchView('train'));
+
+      renderDaysGrid();
+    }
+
+
+    // --- SECCIÓN: GENERADOR DE AVATAR EN SVG (Soporte en caso de error de foto real) ---
+    function generatePlayerAvatarSVG(player) {
+      const skin = player.skin || "#ffd1a4";
+      const legend = player.legend;
+      let jerseyColors = ["#1a8cff", "#ffffff"]; 
+
+      if (player.country === "Francia") jerseyColors = ["#001f3f", "#ffffff"];
+      else if (player.country === "Brasil") jerseyColors = ["#fed100", "#009c3a"];
+      else if (player.country === "Inglaterra") jerseyColors = ["#ffffff", "#000033"];
+      else if (player.country === "Alemania") jerseyColors = ["#ffffff", "#000000"];
+      else if (player.country === "Bélgica") jerseyColors = ["#e30613", "#000000"];
+      else if (player.country === "Polonia") jerseyColors = ["#dc143c", "#ffffff"];
+      else if (player.country === "Uruguay") jerseyColors = ["#5bc2e7", "#ffffff"];
+      else if (player.country === "Colombia") jerseyColors = ["#fcd116", "#003893"];
+      else if (player.country === "España") jerseyColors = ["#c60b1e", "#f1bf00"];
+      else if (player.country === "Canadá") jerseyColors = ["#ff0000", "#ffffff"];
+      else if (player.country === "Corea del Sur") jerseyColors = ["#ff0000", "#000000"];
+      else if (player.country === "Noruega") jerseyColors = ["#ba0c2f", "#00205b"];
+      else if (player.country === "Portugal") jerseyColors = ["#da121a", "#117a3a"];
+      else if (player.country === "Turquía") jerseyColors = ["#e30a17", "#ffffff"];
+      else if (player.country === "Egipto") jerseyColors = ["#c09300", "#000000"];
+
+      let hairColor = "#221100";
+      if (player.hair.includes("rubio") || player.hair.includes("platinad")) hairColor = "#ffdd6b";
+      else if (player.hair.includes("colorado")) hairColor = "#ff6a00";
+      else if (player.hair.includes("fantasía")) hairColor = "#ff00ea";
+
+      let svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-full h-full">
+          <circle cx="50" cy="50" r="48" fill="#141d26" stroke="${legend ? '#d4af37' : '#22c55e'}" stroke-width="1"/>
+          <path d="M50 0 L100 100 L0 100 Z" fill="rgba(255,255,255,0.05)" />
+          <path d="M20 90 C20 70, 80 70, 80 90" fill="${jerseyColors[0]}" />
+          ${player.country === "Argentina" ? `
+            <path d="M38 72 L38 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+            <path d="M50 71 L50 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+            <path d="M62 72 L62 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
+          ` : `
+            <path d="M40 73 C40 80, 60 80, 60 73" fill="${jerseyColors[1]}" />
+          `}
+          <rect x="42" y="60" width="16" height="15" fill="${skin}" rx="2" />
+          <circle cx="50" cy="45" r="18" fill="${skin}" />
+          ${player.hair.includes("calvo") ? `
+            <path d="M35 40 C35 30, 65 30, 65 40" stroke="${skin}" stroke-width="1" fill="none"/>
+          ` : `
+            <path d="M32 40 C30 25, 70 25, 68 40 C62 30, 38 30, 32 40" fill="${hairColor}" />
+          `}
+          ${player.hair.includes("rulos") || player.hair.includes("afro") ? `
+            <circle cx="50" cy="24" r="8" fill="${hairColor}" />
+            <circle cx="42" cy="26" r="8" fill="${hairColor}" />
+            <circle cx="58" cy="26" r="8" fill="${hairColor}" />
+            <circle cx="35" cy="32" r="7" fill="${hairColor}" />
+            <circle cx="65" cy="32" r="7" fill="${hairColor}" />
+          ` : ''}
+          <circle cx="44" cy="44" r="2" fill="#333" />
+          <circle cx="56" cy="44" r="2" fill="#333" />
+          <path d="M40 39 Q44 38 48 41" stroke="#221100" stroke-width="1.5" fill="none" />
+          <path d="M60 39 Q56 38 52 41" stroke="#221100" stroke-width="1.5" fill="none" />
+          <path d="M50 43 L50 48 Q50 50 48 50" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none" />
+          <path d="M43 52 Q50 57 57 52" stroke="#221100" stroke-width="1.5" fill="none" />
+        </svg>
+      `;
+      return svg;
+    }
+
+    // --- DISEÑO DE TARJETA CON CARGA DUAL (Imagen Real -> Fallback SVG) ---
+    function getCardHTML(player, isUnlocked = true, count = 1) {
+      if (!isUnlocked) {
+        return `
+          <div class="aspect-[2/3] w-full bg-zinc-900/60 border-2 border-zinc-800 rounded-2xl flex flex-col items-center justify-center p-2.5 relative opacity-60">
+            <span class="text-xl text-zinc-700 font-extrabold">#${player.id}</span>
+            <div class="w-12 h-12 rounded-full bg-zinc-800/80 my-3 flex items-center justify-center">
+              <span class="text-lg text-zinc-600">❓</span>
+            </div>
+            <p class="text-[9px] font-black text-zinc-500 text-center uppercase tracking-wider">${player.name.split(' ')[1] || player.name}</p>
+            <span class="absolute bottom-2 right-2 text-[10px] text-zinc-600 font-bold">${player.emoji}</span>
+          </div>
+        `;
+      }
+
+      let tierColor = "from-emerald-800 via-emerald-900 to-black border-emerald-500 text-emerald-400";
+      let tierGlow = "shadow-md shadow-emerald-500/10";
+      let isLegendary = player.legend || player.category === "legends";
+
+      if (isLegendary) {
+        tierColor = "from-yellow-600 via-amber-950 to-black border-yellow-400 text-yellow-400 card-shiny";
+        tierGlow = "shadow-lg shadow-yellow-500/20";
+      } else if (player.category === "argentina") {
+        tierColor = "from-sky-800 via-sky-950 to-black border-sky-400 text-sky-300";
+        tierGlow = "shadow-md shadow-sky-400/20";
+      } else if (player.category === "rookies") {
+        tierColor = "from-purple-900 via-slate-950 to-black border-purple-400 text-purple-300";
+        tierGlow = "shadow-md shadow-purple-500/10";
+      }
+
+      const avatarFallback = generatePlayerAvatarSVG(player);
+
+      return `
+        <div id="card-inner-${player.id}" class="aspect-[2/3] w-full bg-gradient-to-b ${tierColor} border-2 rounded-2xl p-2 flex flex-col justify-between relative cursor-pointer transform hover:scale-105 active:scale-95 transition duration-300 ${tierGlow} overflow-hidden group">
+          ${isLegendary ? `<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-400/10 via-transparent to-transparent pointer-events-none"></div>` : ''}
+
+          <!-- Header de la Figu -->
+          <div class="flex justify-between items-center z-10">
+            <div class="flex flex-col items-center">
+              <span class="text-base font-black tracking-tighter leading-none text-white">${player.ovr}</span>
+              <span class="text-[7px] font-black uppercase text-gray-300">${player.pos}</span>
+            </div>
+            <span class="text-[10px] font-bold bg-black/40 px-1.5 py-0.5 rounded text-white">${player.emoji}</span>
+          </div>
+
+          <!-- Imagen del Jugador -->
+          <div class="relative w-16 h-16 md:w-18 md:h-18 mx-auto my-1 rounded-full overflow-hidden border border-white/10 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] bg-zinc-950/80">
+            <img src="${player.photoUrl}" alt="${player.name}" class="w-full h-full object-cover animate-fade-in" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+            <div class="hidden w-full h-full">
+              ${avatarFallback}
+            </div>
+          </div>
+
+          <!-- Nombre del Crack -->
+          <div class="text-center z-10">
+            <h4 class="text-[9px] font-black tracking-tight text-white uppercase group-hover:text-yellow-300 transition duration-150 truncate">${player.name}</h4>
+            <p class="text-[7px] text-gray-300 font-medium tracking-wide uppercase leading-none truncate">${player.country}</p>
+          </div>
+
+          <!-- Barra de Stats del Pie -->
+          <div class="grid grid-cols-6 gap-0.5 text-center text-[5px] font-extrabold border-t border-white/10 pt-1 text-white z-10 bg-black/20 p-0.5 rounded">
+            <div>
+              <div class="text-[4px] text-gray-400">PAC</div>
+              <div>${player.stats[0]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">SHO</div>
+              <div>${player.stats[1]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">PAS</div>
+              <div>${player.stats[2]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">DRI</div>
+              <div>${player.stats[3]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">DEF</div>
+              <div>${player.stats[4]}</div>
+            </div>
+            <div>
+              <div class="text-[4px] text-gray-400">PHY</div>
+              <div>${player.stats[5]}</div>
+            </div>
+          </div>
+
+          <!-- Distintivos Especiales -->
+          <div class="absolute top-2 right-2 flex items-center gap-1 z-10">
+            ${isLegendary ? `<span class="text-[7px] bg-yellow-400 text-black px-1 rounded font-black">LEYENDA</span>` : ''}
+          </div>
+
+          <!-- Contador de Repetidas -->
+          ${count > 1 ? `
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black font-black text-[9px] px-2 py-0.5 rounded-full shadow-lg border border-white flex items-center gap-1 z-20">
+              <span>Repetidas:</span>
+              <span class="text-xs font-black">${count - 1}</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // --- MI ÁLBUM FILTRADO Y PINTADO ---
+    let currentFilter = 'all';
+
+    window.filterAlbum = function(cat) {
+      playSound('click');
+      currentFilter = cat;
+      
+      const buttons = ['all', 'argentina', 'stars', 'rookies', 'legends', 'repeats'];
+      buttons.forEach(b => {
+        const btn = document.getElementById(`btn-filt-${b}`);
+        if (b === cat) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-500 text-black";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300";
+        }
+      });
+
+      renderAlbumGrid();
+    };
+
+    function renderAlbumGrid() {
+      const grid = document.getElementById('album-grid');
+      grid.innerHTML = "";
+
+      let list = PLAYERS;
+
+      if (currentFilter === 'argentina') {
+        list = PLAYERS.filter(p => p.category === 'argentina');
+      } else if (currentFilter === 'stars') {
+        list = PLAYERS.filter(p => p.category === 'stars');
+      } else if (currentFilter === 'rookies') {
+        list = PLAYERS.filter(p => p.category === 'rookies');
+      } else if (currentFilter === 'legends') {
+        list = PLAYERS.filter(p => p.category === 'legends');
+      } else if (currentFilter === 'repeats') {
+        list = PLAYERS.filter(p => gameState.repeats && gameState.repeats[p.id] && gameState.repeats[p.id] > 0);
+      }
+
+      list.forEach(p => {
+        const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(p.id) : false;
+        const count = hasIt ? (1 + (gameState.repeats[p.id] || 0)) : 0;
+        
+        const cardContainer = document.createElement('div');
+        cardContainer.className = "w-full flex flex-col";
+        cardContainer.innerHTML = getCardHTML(p, hasIt, count);
+        
+        if (hasIt) {
+          const innerCard = cardContainer.querySelector(`#card-inner-${p.id}`);
+          if (innerCard) {
+            innerCard.addEventListener('click', () => openCardZoom(p.id));
+          }
+        }
+
+        if (currentFilter === 'repeats' && count > 1) {
+          const sellBtn = document.createElement('button');
+          sellBtn.className = "w-full mt-2 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[9px] py-1.5 px-2 rounded-lg tracking-wider transition uppercase";
+          sellBtn.innerText = "Vender por 🪙 15";
+          sellBtn.onclick = (e) => {
+            e.stopPropagation();
+            sellRepeat(p.id);
+          };
+          cardContainer.appendChild(sellBtn);
+        }
+
+        grid.appendChild(cardContainer);
+      });
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500 text-sm font-black uppercase">
+            No tenés ninguna figurita de esta categoría. ¡A por más sobres! ⚽
+          </div>
+        `;
+      }
+    }
+
+    function sellRepeat(id) {
+      if (gameState.repeats[id] && gameState.repeats[id] > 0) {
+        playSound('success');
+        gameState.repeats[id]--;
+        gameState.coins += 15; 
+        saveGame();
+        renderAlbumGrid();
+        showAlert("¡Vendiste una repetida al kiosquero por 🪙 15!", "🪙");
+      }
+    }
+
+    // Zoom en Figurita individual
+    function openCardZoom(id) {
+      playSound('click');
+      const player = PLAYERS.find(p => p.id === id);
+      const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(id) : false;
+      if (!player || !hasIt) return;
+
+      const modal = document.getElementById('card-modal');
+      const placeholder = document.getElementById('modal-card-placeholder');
+      const info = document.getElementById('modal-card-info');
+
+      placeholder.innerHTML = getCardHTML(player, true, 1);
+      
+      let isLegendary = player.legend || player.category === "legends";
+
+      info.innerHTML = `
+        <h3 class="text-xl font-black text-white mt-4 uppercase">${player.name}</h3>
+        <p class="text-xs text-yellow-400 font-extrabold uppercase tracking-widest">${player.category === 'argentina' ? 'Héroe de la Scaloneta 🇦🇷' : (isLegendary ? 'Leyenda del Fútbol Mundial 👑' : 'Crack Internacional ⭐')}</p>
+        <p class="text-sm text-gray-300 mt-2 leading-relaxed">
+          Pisa la cancha con su rol de <strong>${player.pos}</strong> con una media de <strong>${player.ovr}</strong>.
+        </p>
+        <div class="mt-4 bg-emerald-950/40 p-3 rounded-2xl text-xs text-gray-300 border border-emerald-500/15">
+          <div class="grid grid-cols-2 gap-2 text-left font-bold">
+            <div>🏃 Ritmo (PAC): <strong>${player.stats[0]}</strong></div>
+            <div>🎯 Tiro (SHO): <strong>${player.stats[1]}</strong></div>
+            <div>👟 Pase (PAS): <strong>${player.stats[2]}</strong></div>
+            <div>🪄 Regate (DRI): <strong>${player.stats[3]}</strong></div>
+            <div>🛡️ Defensa (DEF): <strong>${player.stats[4]}</strong></div>
+            <div>💪 Físico (PHY): <strong>${player.stats[5]}</strong></div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    window.closeCardModal = function() {
+      document.getElementById('card-modal').classList.add('hidden');
+    };
+
+    // --- KIOSCO DE SOBRES (TIENDA) ---
+    let pendingPackRewards = [];
+
+    window.resetOpener = function() {
+      document.getElementById('opener-idle').classList.remove('hidden');
+      document.getElementById('opener-opening').classList.add('hidden');
+      document.getElementById('opener-results').classList.add('hidden');
+      pendingPackRewards = [];
+    };
+
+    window.buyPack = function() {
+      playSound('click');
+      if (gameState.coins < 50) {
+        showAlert("¡Che! No te alcanzan las monedas. Hacé los entrenamientos oficiales para jugar más.", "❌");
+        return;
+      }
+
+      gameState.coins -= 50;
+      gameState.openedPacks = (gameState.openedPacks || 0) + 1;
+      saveGame();
+
+      pendingPackRewards = generatePackFiguritas();
+
+      document.getElementById('opener-idle').classList.add('hidden');
+      document.getElementById('opener-opening').classList.remove('hidden');
+      document.getElementById('opener-results').classList.add('hidden');
+
+      document.getElementById('pack-graphic').className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 shake cursor-pointer";
+      document.getElementById('pack-graphic').onclick = performOpenPack;
+    };
+
+    function generatePackFiguritas() {
+      const generated = [];
+      for (let i = 0; i < 5; i++) {
+        const rand = Math.random() * 100;
+        let selectedCategory = "rookies"; 
+
+        if (rand < 7) {
+          selectedCategory = "legends"; 
+        } else if (rand < 27) {
+          selectedCategory = "argentina"; 
+        } else if (rand < 62) {
+          selectedCategory = "stars"; 
+        }
+
+        const possiblePlayers = PLAYERS.filter(p => p.category === selectedCategory);
+        const chosen = possiblePlayers[Math.floor(Math.random() * possiblePlayers.length)];
+        generated.push(chosen);
+      }
+      return generated;
+    }
+
+    function performOpenPack() {
+      playSound('rustle');
+      
+      const graphic = document.getElementById('pack-graphic');
+      graphic.onclick = null; 
+      graphic.className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 transition duration-500 scale-90 opacity-0";
+
+      setTimeout(() => {
+        document.getElementById('opener-opening').classList.add('hidden');
+        document.getElementById('opener-results').classList.remove('hidden');
+
+        const container = document.getElementById('revealed-cards-container');
+        container.innerHTML = "";
+
+        pendingPackRewards.forEach((player, idx) => {
+          const isRepeat = gameState.collectedIds ? gameState.collectedIds.includes(player.id) : false;
+          const hasLegendary = player.legend || player.category === "legends";
+
+          const cardWrapper = document.createElement('div');
+          cardWrapper.className = "w-28 sm:w-32 flex flex-col items-center gap-1.5 transition duration-500 opacity-0 transform translate-y-4";
+          cardWrapper.innerHTML = `
+            ${getCardHTML(player, true, 1)}
+            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isRepeat ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30' : 'bg-emerald-500 text-black'}">
+              ${isRepeat ? '⚡ REPETIDA' : '✨ ¡NUEVA!'}
+            </span>
+          `;
+
+          container.appendChild(cardWrapper);
+
+          const innerCard = cardWrapper.querySelector(`#card-inner-${player.id}`);
+          if (innerCard) {
+            innerCard.addEventListener('click', () => openCardZoom(player.id));
+          }
+
+          setTimeout(() => {
+            cardWrapper.classList.remove('opacity-0', 'translate-y-4');
+            if (hasLegendary) {
+              playSound('shiny');
+            } else {
+              playSound('click');
+            }
+          }, idx * 300);
+        });
+
+      }, 500);
+    }
+
+    window.collectPackResults = function() {
+      playSound('success');
+
+      if (!gameState.collectedIds) gameState.collectedIds = [];
+      if (!gameState.repeats) gameState.repeats = {};
+
+      pendingPackRewards.forEach(player => {
+        if (!gameState.collectedIds.includes(player.id)) {
+          gameState.collectedIds.push(player.id);
+        } else {
+          if (!gameState.repeats[player.id]) {
+            gameState.repeats[player.id] = 0;
+          }
+          gameState.repeats[player.id]++;
+        }
+      });
+
+      gameState.collectedIds.sort((a,b) => a - b);
+      saveGame();
+      resetOpener();
+      showAlert("¡Figuritas pegadas con plasticola en el álbum!", "📖");
+    };
+
+
+    // --- SECCIÓN: TABLA DE POSICIONES (AMIGOS) ---
+    async function loadFriendsLeaderboard() {
+      const tbody = document.getElementById('leaderboard-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-8">
+            <div class="animate-spin inline-block w-6 h-6 border-4 border-current border-t-transparent text-emerald-500 rounded-full mb-2"></div>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escaneando el vestuario de los amigos...</p>
+          </td>
+        </tr>
+      `;
+
+      let playersList = [];
+
+      if (isCloudEnabled && db) {
+        try {
+          const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
+          const querySnapshot = await getDocs(colRef);
+          
+          querySnapshot.forEach((doc) => {
+            playersList.push(doc.data());
+          });
+        } catch(e) {
+          console.warn("Fallo cargando multijugador.", e);
+        }
+      }
+
+      if (playersList.length === 0) {
+        playersList.push(gameState);
+        playersList.push({
+          nickname: "Marti_Scaloneta",
+          avatarTeam: "MES",
+          collectedIds: [1, 2, 3, 4, 15, 20, 21, 41, 45],
+          coins: 20,
+          uniquesCount: 9,
+          openedPacks: 3,
+          lastUpdated: new Date().toISOString()
+        });
+        playersList.push({
+          nickname: "Nico_Messi10",
+          avatarTeam: "DIB",
+          collectedIds: [1, 5, 8, 12, 19, 22],
+          coins: 80,
+          uniquesCount: 6,
+          openedPacks: 2,
+          lastUpdated: new Date().toISOString()
+        });
+        playersList.push({
+          nickname: "Sofi_Potrero",
+          avatarTeam: "JUL",
+          collectedIds: [1, 15, 31, 34, 48],
+          coins: 100,
+          uniquesCount: 5,
+          openedPacks: 1,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      playersList.sort((a, b) => {
+        const countA = a.collectedIds ? a.collectedIds.length : 0;
+        const countB = b.collectedIds ? b.collectedIds.length : 0;
+        return countB - countA;
+      });
+
+      tbody.innerHTML = "";
+
+      playersList.forEach((player, idx) => {
+        const uniques = player.collectedIds ? player.collectedIds.length : 0;
+        const percent = Math.round((uniques / 50) * 100);
+        const hero = AVATAR_PLAYERS.find(t => t.code === player.avatarTeam) || AVATAR_PLAYERS[0];
+        const isCurrent = sanitizeNickname(player.nickname) === sanitizeNickname(gameState.nickname);
+
+        const dateStr = player.lastUpdated ? new Date(player.lastUpdated).toLocaleDateString() : "Hoy";
+
+        const tr = document.createElement('tr');
+        tr.className = isCurrent ? "bg-emerald-500/10 border-l-4 border-emerald-500" : "hover:bg-zinc-900/40";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-black">
+            ${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`))}
+          </td>
+          <td class="py-3 px-4 flex items-center gap-2">
+            <span class="text-xl">${hero.emoji}</span>
+            <div>
+              <span class="font-black ${isCurrent ? 'text-emerald-400' : 'text-gray-200'}">${player.nickname}</span>
+              ${isCurrent ? '<span class="text-[9px] bg-emerald-500 text-black px-1.5 py-0.5 rounded ml-1.5 font-bold uppercase tracking-wider">VOS</span>' : ''}
+            </div>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="font-extrabold text-emerald-400">${uniques} / 50</div>
+            <div class="text-[10px] text-gray-400 font-bold uppercase">${percent}% PEGADO</div>
+          </td>
+          <td class="py-3 px-4 text-center text-gray-400">${player.openedPacks || 0}</td>
+          <td class="py-3 px-4 text-center text-yellow-500 font-bold">🪙 ${player.coins}</td>
+          <td class="py-3 px-4 text-right text-xs text-gray-500">${dateStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- MANEJO DEL MODAL DE CONFIGURACIÓN ---
+    window.openCloudConfigModal = function() {
+      playSound('click');
+      document.getElementById('cloud-config-modal').classList.remove('hidden');
+    };
+    window.closeCloudConfigModal = function() {
+      playSound('click');
+      document.getElementById('cloud-config-modal').classList.add('hidden');
+    };
+
+    // --- AL CARGAR LA PÁGINA ---
+    window.onload = function() {
+      initFirebase();
+    };
+
+  </script>
+
+</body>
+</html>
