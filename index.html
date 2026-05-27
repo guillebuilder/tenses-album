@@ -45,68 +45,78 @@
 
   <!-- Sonidos Sintetizados (Web Audio API) -->
   <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioCtx = null;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {
+      console.warn("Web Audio API no soportada en este entorno sandbox.");
+    }
     
     function playSound(type) {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
-      } else if (type === 'success') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
-        osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.5);
-      } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.35);
-      } else if (type === 'shiny') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.6);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.6);
-      } else if (type === 'rustle') {
-        const bufferSize = audioCtx.sampleRate * 0.2;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
+      if (!audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
         }
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 1000;
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-        noise.start();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+          osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.5);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+          osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+        } else if (type === 'shiny') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.6);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.6);
+        } else if (type === 'rustle') {
+          const bufferSize = audioCtx.sampleRate * 0.2;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1000;
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+          noise.start();
+        }
+      } catch(e) {
+        console.warn("No se pudo reproducir audio:", e);
       }
     }
   </script>
@@ -507,6 +517,7 @@
     function showCloudError(message, isTechnical = false) {
       const banner = document.getElementById('cloud-status-banner');
       const successBanner = document.getElementById('cloud-success-banner');
+      if (!banner || !successBanner) return;
       
       successBanner.classList.add('hidden');
       banner.classList.remove('hidden');
@@ -531,12 +542,14 @@
     // Inicializar Firebase
     function initFirebase() {
       let finalConfig = null;
-      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try {
+      try {
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
           finalConfig = JSON.parse(__firebase_config);
-        } catch(e) {}
-      } else if (customFirebaseConfig.apiKey) {
-        finalConfig = customFirebaseConfig;
+        } else if (customFirebaseConfig.apiKey) {
+          finalConfig = customFirebaseConfig;
+        }
+      } catch (errJson) {
+        console.warn("Fallo de parsing __firebase_config:", errJson);
       }
 
       if (finalConfig) {
@@ -551,10 +564,15 @@
               currentAuthUser = user;
               if (user) {
                 // Conexión exitosa, ocultar banner amarillo, mostrar banner verde
-                document.getElementById('cloud-success-banner').classList.remove('hidden');
-                document.getElementById('cloud-status-banner').classList.add('hidden');
+                const successB = document.getElementById('cloud-success-banner');
+                const statusB = document.getElementById('cloud-status-banner');
+                if (successB) successB.classList.remove('hidden');
+                if (statusB) statusB.classList.add('hidden');
                 
-                const activeName = localStorage.getItem('tense_cup_2026_active_profile');
+                let activeName = null;
+                try {
+                  activeName = localStorage.getItem('tense_cup_2026_active_profile');
+                } catch(e) {}
                 if (activeName) {
                   loadProfileData(activeName);
                 }
@@ -589,11 +607,14 @@
       isCloudEnabled = false;
       // Si no hay un mensaje de error técnico ya puesto, mostrar el banner local por defecto
       const banner = document.getElementById('cloud-status-banner');
-      if (!banner.innerHTML.includes("🚨 ERROR")) {
+      if (banner && !banner.innerHTML.includes("🚨 ERROR")) {
         showCloudError();
       }
       
-      const activeName = localStorage.getItem('tense_cup_2026_active_profile');
+      let activeName = null;
+      try {
+        activeName = localStorage.getItem('tense_cup_2026_active_profile');
+      } catch(e) {}
       if (activeName) {
         loadProfileData(activeName);
       }
@@ -1235,771 +1256,4 @@
       const panel = document.getElementById('day-panel');
       panel.classList.remove('hidden');
 
-      const introDiv = document.getElementById('day-intro');
-      const isCompleted = gameState.completedDays.includes(dayNum);
-
-      introDiv.innerHTML = `
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <span class="text-[10px] font-black text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2.5 py-1 rounded-md border border-yellow-400/20">Charla Técnica Oficial</span>
-            <h3 class="text-xl md:text-2xl font-black text-white mt-2">${dayData.title}</h3>
-          </div>
-          <div class="bg-yellow-500/10 border border-yellow-500/30 p-2.5 rounded-2xl text-center min-w-[120px] self-stretch sm:self-auto flex sm:flex-col justify-between items-center sm:justify-center">
-            <span class="text-[10px] text-gray-400 font-bold uppercase">Premio por ganar</span>
-            <span class="font-extrabold text-yellow-400 text-lg">🪙 ${dayData.reward}</span>
-          </div>
-        </div>
-
-        <div class="mt-4 text-gray-300 text-sm leading-relaxed space-y-3 bg-black/20 p-4 rounded-xl border border-emerald-500/10">
-          <p>${dayData.desc}</p>
-          <div class="bg-emerald-500/10 border-l-4 border-emerald-400 p-3 text-xs italic text-emerald-300">
-            ${dayData.tip}
-          </div>
-        </div>
-
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-          <button id="btn-start-trivia" class="flex-grow bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/20 text-center transition uppercase text-xs tracking-wider">
-            ${isCompleted ? '⚽ Volver a Jugar (Ganás menos monedas)' : '⚽ Salir a jugar el entrenamiento'}
-          </button>
-        </div>
-      `;
-
-      document.getElementById('btn-start-trivia').addEventListener('click', () => startTrivia(dayNum));
-      document.getElementById('day-trivia').classList.add('hidden');
-    }
-
-    function startTrivia(dayNum) {
-      playSound('click');
-      currentQuestionIndex = 0;
-      tempTriviaScore = 0;
-      selectedAnswer = null;
-
-      const triviaDiv = document.getElementById('day-trivia');
-      triviaDiv.classList.remove('hidden');
-      triviaDiv.scrollIntoView({ behavior: 'smooth' });
-
-      renderTriviaQuestion();
-    }
-
-    function renderTriviaQuestion() {
-      const dayData = DAYS_DATA[currentTriviaDay];
-      const qData = dayData.questions[currentQuestionIndex];
-      const triviaDiv = document.getElementById('day-trivia');
-
-      selectedAnswer = null;
-      isQuestionAnswered = false; 
-
-      triviaDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-4">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Jugada ${currentQuestionIndex + 1} de 5</span>
-          <div class="h-2 w-32 bg-zinc-800 rounded-full overflow-hidden">
-            <div class="h-full bg-emerald-400" style="width: ${(currentQuestionIndex + 1) * 20}%"></div>
-          </div>
-        </div>
-
-        <h4 class="text-base md:text-lg font-bold text-white mb-6 leading-snug bg-emerald-950/60 p-4 rounded-xl border border-emerald-500/20">${qData.q}</h4>
-
-        <div class="grid gap-3" id="options-container">
-          ${qData.options.map((opt, idx) => `
-            <button id="opt-${idx}" class="w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between touch-manipulation">
-              <span>${opt}</span>
-              <span class="text-xs opacity-0" id="badge-${idx}">⚽</span>
-            </button>
-          `).join('')}
-        </div>
-
-        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div id="trivia-feedback" class="text-xs font-semibold text-gray-300 hidden sm:max-w-[70%]"></div>
-          <button id="btn-submit-ans" disabled class="w-full sm:w-auto bg-yellow-500 disabled:opacity-50 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl transition shadow-lg shadow-yellow-500/10 uppercase text-xs tracking-wider touch-manipulation">
-            Patear al Arco
-          </button>
-        </div>
-      `;
-
-      // Event listeners para opciones
-      qData.options.forEach((_, idx) => {
-        document.getElementById(`opt-${idx}`).addEventListener('click', () => selectOption(idx));
-      });
-
-      document.getElementById('btn-submit-ans').addEventListener('click', submitAnswer);
-    }
-
-    function selectOption(idx) {
-      playSound('click');
-      const dayData = DAYS_DATA[currentTriviaDay];
-      const qData = dayData.questions[currentQuestionIndex];
-      
-      if (isQuestionAnswered) {
-        return; 
-      }
-
-      for (let i = 0; i < qData.options.length; i++) {
-        const btn = document.getElementById(`opt-${i}`);
-        const badge = document.getElementById(`badge-${i}`);
-        btn.className = "w-full text-left p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-800/80 transition font-medium text-sm md:text-base flex items-center justify-between";
-        badge.classList.add('opacity-0');
-      }
-
-      const activeBtn = document.getElementById(`opt-${idx}`);
-      const activeBadge = document.getElementById(`badge-${idx}`);
-      activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-950 border-2 border-emerald-500 font-semibold text-sm md:text-base flex items-center justify-between text-emerald-300";
-      activeBadge.classList.remove('opacity-0');
-
-      selectedAnswer = idx;
-      document.getElementById('btn-submit-ans').disabled = false;
-    }
-
-    // El motor booleano garantiza que el flujo de preguntas sea inmune a la capitalización de texto de Tailwind.
-    function submitAnswer() {
-      const dayData = DAYS_DATA[currentTriviaDay];
-      const qData = dayData.questions[currentQuestionIndex];
-      const btn = document.getElementById('btn-submit-ans');
-
-      if (isQuestionAnswered) {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < 5) {
-          renderTriviaQuestion();
-        } else {
-          finishTrivia();
-        }
-        return;
-      }
-
-      const feedbackDiv = document.getElementById('trivia-feedback');
-      feedbackDiv.classList.remove('hidden');
-
-      const isCorrect = selectedAnswer === qData.correct;
-
-      for (let i = 0; i < qData.options.length; i++) {
-        document.getElementById(`opt-${i}`).disabled = true;
-      }
-
-      if (isCorrect) {
-        playSound('success');
-        tempTriviaScore++;
-        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
-        activeBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
-        feedbackDiv.className = "text-sm font-black text-emerald-400 max-w-[70%] flex items-center gap-2";
-        feedbackDiv.innerHTML = "<span>⚽ ¡GOLAZO! ¡La clavaste al ángulo, crack!</span>";
-      } else {
-        playSound('wrong');
-        const activeBtn = document.getElementById(`opt-${selectedAnswer}`);
-        if (activeBtn) activeBtn.className = "w-full text-left p-4 rounded-xl bg-red-600 text-white font-semibold text-sm md:text-base flex items-center justify-between";
-        
-        const correctBtn = document.getElementById(`opt-${qData.correct}`);
-        correctBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500 text-black font-extrabold text-sm md:text-base flex items-center justify-between";
-        
-        feedbackDiv.className = "text-xs font-semibold text-red-300 bg-red-950/40 p-3 rounded-lg border border-red-500/20 max-w-[70%]";
-        feedbackDiv.innerHTML = `<strong>¡Uyyy, al palo!</strong> Fijate: ${qData.reason}`;
-      }
-
-      isQuestionAnswered = true;
-      
-      if (currentQuestionIndex < 4) {
-        btn.innerText = "Siguiente Jugada ➡️";
-      } else {
-        btn.innerText = "Terminar Partido 🏆";
-      }
-      btn.disabled = false;
-    }
-
-    function finishTrivia() {
-      playSound('success');
-      const dayData = DAYS_DATA[currentTriviaDay];
-      const isAlreadyCompleted = gameState.completedDays.includes(currentTriviaDay);
-      
-      let earned = 0;
-      if (!isAlreadyCompleted) {
-        earned = dayData.reward;
-        gameState.completedDays.push(currentTriviaDay);
-        const nextDay = currentTriviaDay + 1;
-        if (nextDay <= 10 && !gameState.unlockedDays.includes(nextDay)) {
-          gameState.unlockedDays.push(nextDay);
-        }
-      } else {
-        earned = Math.round(dayData.reward * 0.3); 
-      }
-
-      gameState.coins += earned;
-      saveGame();
-
-      const triviaDiv = document.getElementById('day-trivia');
-      let titleMsg = "¡Final del partido! Gran victoria ⚽";
-      let starsEmoji = "⭐⭐⭐";
-      if (tempTriviaScore === 5) {
-        titleMsg = "🏆 ¡PARTIDO PERFECTO! ¡SOS LEYENDA DEL POTRERO!";
-        starsEmoji = "⭐⭐⭐⭐⭐";
-      } else if (tempTriviaScore >= 3) {
-        starsEmoji = "⭐⭐⭐⭐";
-      }
-
-      triviaDiv.innerHTML = `
-        <div class="text-center py-6 space-y-4">
-          <div class="text-5xl animate-bounce">🏆</div>
-          <h4 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">${titleMsg}</h4>
-          <p class="text-yellow-400 font-extrabold text-xl tracking-widest">${starsEmoji}</p>
-          <p class="text-sm text-gray-300 max-w-md mx-auto">
-            Metiste <strong>${tempTriviaScore} de 5 golazos</strong> correctos. ¡Se nota ese entrenamiento diario!
-          </p>
-
-          <div class="inline-flex items-center gap-3 bg-yellow-500/20 border border-yellow-500/50 p-4 rounded-2xl">
-            <span class="text-3xl">🪙</span>
-            <div class="text-left">
-              <span class="text-[10px] text-gray-400 font-bold block leading-none">RECOMPENSA</span>
-              <span class="text-2xl font-black text-yellow-400">+ ${earned} Monedas</span>
-            </div>
-          </div>
-
-          <div class="pt-4 flex flex-col sm:flex-row justify-center gap-3">
-            <button id="btn-res-shop" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-3.5 px-6 rounded-xl transition shadow-lg shadow-yellow-500/20 uppercase text-xs tracking-wider">
-              🛍️ Ir al Kiosquero a comprar sobres
-            </button>
-            <button id="btn-res-calendar" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black py-3.5 px-6 rounded-xl transition uppercase text-xs tracking-wider">
-              📅 Volver al fixture
-            </button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('btn-res-shop').addEventListener('click', () => switchView('shop'));
-      document.getElementById('btn-res-calendar').addEventListener('click', () => switchView('train'));
-
-      renderDaysGrid();
-    }
-
-
-    // --- SECCIÓN: GENERADOR DE AVATAR EN SVG (Soporte en caso de error de foto real) ---
-    function generatePlayerAvatarSVG(player) {
-      const skin = player.skin || "#ffd1a4";
-      const legend = player.legend;
-      let jerseyColors = ["#1a8cff", "#ffffff"]; 
-
-      if (player.country === "Francia") jerseyColors = ["#001f3f", "#ffffff"];
-      else if (player.country === "Brasil") jerseyColors = ["#fed100", "#009c3a"];
-      else if (player.country === "Inglaterra") jerseyColors = ["#ffffff", "#000033"];
-      else if (player.country === "Alemania") jerseyColors = ["#ffffff", "#000000"];
-      else if (player.country === "Bélgica") jerseyColors = ["#e30613", "#000000"];
-      else if (player.country === "Polonia") jerseyColors = ["#dc143c", "#ffffff"];
-      else if (player.country === "Uruguay") jerseyColors = ["#5bc2e7", "#ffffff"];
-      else if (player.country === "Colombia") jerseyColors = ["#fcd116", "#003893"];
-      else if (player.country === "España") jerseyColors = ["#c60b1e", "#f1bf00"];
-      else if (player.country === "Canadá") jerseyColors = ["#ff0000", "#ffffff"];
-      else if (player.country === "Corea del Sur") jerseyColors = ["#ff0000", "#000000"];
-      else if (player.country === "Noruega") jerseyColors = ["#ba0c2f", "#00205b"];
-      else if (player.country === "Portugal") jerseyColors = ["#da121a", "#117a3a"];
-      else if (player.country === "Turquía") jerseyColors = ["#e30a17", "#ffffff"];
-      else if (player.country === "Egipto") jerseyColors = ["#c09300", "#000000"];
-
-      let hairColor = "#221100";
-      if (player.hair.includes("rubio") || player.hair.includes("platinad")) hairColor = "#ffdd6b";
-      else if (player.hair.includes("colorado")) hairColor = "#ff6a00";
-      else if (player.hair.includes("fantasía")) hairColor = "#ff00ea";
-
-      let svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-full h-full">
-          <circle cx="50" cy="50" r="48" fill="#141d26" stroke="${legend ? '#d4af37' : '#22c55e'}" stroke-width="1"/>
-          <path d="M50 0 L100 100 L0 100 Z" fill="rgba(255,255,255,0.05)" />
-          <path d="M20 90 C20 70, 80 70, 80 90" fill="${jerseyColors[0]}" />
-          ${player.country === "Argentina" ? `
-            <path d="M38 72 L38 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
-            <path d="M50 71 L50 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
-            <path d="M62 72 L62 90" stroke="${jerseyColors[1]}" stroke-width="6"/>
-          ` : `
-            <path d="M40 73 C40 80, 60 80, 60 73" fill="${jerseyColors[1]}" />
-          `}
-          <rect x="42" y="60" width="16" height="15" fill="${skin}" rx="2" />
-          <circle cx="50" cy="45" r="18" fill="${skin}" />
-          ${player.hair.includes("calvo") ? `
-            <path d="M35 40 C35 30, 65 30, 65 40" stroke="${skin}" stroke-width="1" fill="none"/>
-          ` : `
-            <path d="M32 40 C30 25, 70 25, 68 40 C62 30, 38 30, 32 40" fill="${hairColor}" />
-          `}
-          ${player.hair.includes("rulos") || player.hair.includes("afro") ? `
-            <circle cx="50" cy="24" r="8" fill="${hairColor}" />
-            <circle cx="42" cy="26" r="8" fill="${hairColor}" />
-            <circle cx="58" cy="26" r="8" fill="${hairColor}" />
-            <circle cx="35" cy="32" r="7" fill="${hairColor}" />
-            <circle cx="65" cy="32" r="7" fill="${hairColor}" />
-          ` : ''}
-          <circle cx="44" cy="44" r="2" fill="#333" />
-          <circle cx="56" cy="44" r="2" fill="#333" />
-          <path d="M40 39 Q44 38 48 41" stroke="#221100" stroke-width="1.5" fill="none" />
-          <path d="M60 39 Q56 38 52 41" stroke="#221100" stroke-width="1.5" fill="none" />
-          <path d="M50 43 L50 48 Q50 50 48 50" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none" />
-          <path d="M43 52 Q50 57 57 52" stroke="#221100" stroke-width="1.5" fill="none" />
-        </svg>
-      `;
-      return svg;
-    }
-
-    // --- DISEÑO DE TARJETA CON CARGA DUAL (Imagen Real -> Fallback SVG) ---
-    function getCardHTML(player, isUnlocked = true, count = 1) {
-      if (!isUnlocked) {
-        return `
-          <div class="aspect-[2/3] w-full bg-zinc-900/60 border-2 border-zinc-800 rounded-2xl flex flex-col items-center justify-center p-2.5 relative opacity-60">
-            <span class="text-xl text-zinc-700 font-extrabold">#${player.id}</span>
-            <div class="w-12 h-12 rounded-full bg-zinc-800/80 my-3 flex items-center justify-center">
-              <span class="text-lg text-zinc-600">❓</span>
-            </div>
-            <p class="text-[9px] font-black text-zinc-500 text-center uppercase tracking-wider">${player.name.split(' ')[1] || player.name}</p>
-            <span class="absolute bottom-2 right-2 text-[10px] text-zinc-600 font-bold">${player.emoji}</span>
-          </div>
-        `;
-      }
-
-      let tierColor = "from-emerald-800 via-emerald-900 to-black border-emerald-500 text-emerald-400";
-      let tierGlow = "shadow-md shadow-emerald-500/10";
-      let isLegendary = player.legend || player.category === "legends";
-
-      if (isLegendary) {
-        tierColor = "from-yellow-600 via-amber-950 to-black border-yellow-400 text-yellow-400 card-shiny";
-        tierGlow = "shadow-lg shadow-yellow-500/20";
-      } else if (player.category === "argentina") {
-        tierColor = "from-sky-800 via-sky-950 to-black border-sky-400 text-sky-300";
-        tierGlow = "shadow-md shadow-sky-400/20";
-      } else if (player.category === "rookies") {
-        tierColor = "from-purple-900 via-slate-950 to-black border-purple-400 text-purple-300";
-        tierGlow = "shadow-md shadow-purple-500/10";
-      }
-
-      const avatarFallback = generatePlayerAvatarSVG(player);
-
-      return `
-        <div id="card-inner-${player.id}" class="aspect-[2/3] w-full bg-gradient-to-b ${tierColor} border-2 rounded-2xl p-2 flex flex-col justify-between relative cursor-pointer transform hover:scale-105 active:scale-95 transition duration-300 ${tierGlow} overflow-hidden group">
-          ${isLegendary ? `<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-400/10 via-transparent to-transparent pointer-events-none"></div>` : ''}
-
-          <!-- Header de la Figu -->
-          <div class="flex justify-between items-center z-10">
-            <div class="flex flex-col items-center">
-              <span class="text-base font-black tracking-tighter leading-none text-white">${player.ovr}</span>
-              <span class="text-[7px] font-black uppercase text-gray-300">${player.pos}</span>
-            </div>
-            <span class="text-[10px] font-bold bg-black/40 px-1.5 py-0.5 rounded text-white">${player.emoji}</span>
-          </div>
-
-          <!-- Imagen del Jugador -->
-          <div class="relative w-16 h-16 md:w-18 md:h-18 mx-auto my-1 rounded-full overflow-hidden border border-white/10 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] bg-zinc-950/80">
-            <img src="${player.photoUrl}" alt="${player.name}" class="w-full h-full object-cover animate-fade-in" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
-            <div class="hidden w-full h-full">
-              ${avatarFallback}
-            </div>
-          </div>
-
-          <!-- Nombre del Crack -->
-          <div class="text-center z-10">
-            <h4 class="text-[9px] font-black tracking-tight text-white uppercase group-hover:text-yellow-300 transition duration-150 truncate">${player.name}</h4>
-            <p class="text-[7px] text-gray-300 font-medium tracking-wide uppercase leading-none truncate">${player.country}</p>
-          </div>
-
-          <!-- Barra de Stats del Pie -->
-          <div class="grid grid-cols-6 gap-0.5 text-center text-[5px] font-extrabold border-t border-white/10 pt-1 text-white z-10 bg-black/20 p-0.5 rounded">
-            <div>
-              <div class="text-[4px] text-gray-400">PAC</div>
-              <div>${player.stats[0]}</div>
-            </div>
-            <div>
-              <div class="text-[4px] text-gray-400">SHO</div>
-              <div>${player.stats[1]}</div>
-            </div>
-            <div>
-              <div class="text-[4px] text-gray-400">PAS</div>
-              <div>${player.stats[2]}</div>
-            </div>
-            <div>
-              <div class="text-[4px] text-gray-400">DRI</div>
-              <div>${player.stats[3]}</div>
-            </div>
-            <div>
-              <div class="text-[4px] text-gray-400">DEF</div>
-              <div>${player.stats[4]}</div>
-            </div>
-            <div>
-              <div class="text-[4px] text-gray-400">PHY</div>
-              <div>${player.stats[5]}</div>
-            </div>
-          </div>
-
-          <!-- Distintivos Especiales -->
-          <div class="absolute top-2 right-2 flex items-center gap-1 z-10">
-            ${isLegendary ? `<span class="text-[7px] bg-yellow-400 text-black px-1 rounded font-black">LEYENDA</span>` : ''}
-          </div>
-
-          <!-- Contador de Repetidas -->
-          ${count > 1 ? `
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black font-black text-[9px] px-2 py-0.5 rounded-full shadow-lg border border-white flex items-center gap-1 z-20">
-              <span>Repetidas:</span>
-              <span class="text-xs font-black">${count - 1}</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }
-
-    // --- MI ÁLBUM FILTRADO Y PINTADO ---
-    let currentFilter = 'all';
-
-    window.filterAlbum = function(cat) {
-      playSound('click');
-      currentFilter = cat;
-      
-      const buttons = ['all', 'argentina', 'stars', 'rookies', 'legends', 'repeats'];
-      buttons.forEach(b => {
-        const btn = document.getElementById(`btn-filt-${b}`);
-        if (b === cat) {
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-500 text-black";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-black uppercase bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300";
-        }
-      });
-
-      renderAlbumGrid();
-    };
-
-    function renderAlbumGrid() {
-      const grid = document.getElementById('album-grid');
-      grid.innerHTML = "";
-
-      let list = PLAYERS;
-
-      if (currentFilter === 'argentina') {
-        list = PLAYERS.filter(p => p.category === 'argentina');
-      } else if (currentFilter === 'stars') {
-        list = PLAYERS.filter(p => p.category === 'stars');
-      } else if (currentFilter === 'rookies') {
-        list = PLAYERS.filter(p => p.category === 'rookies');
-      } else if (currentFilter === 'legends') {
-        list = PLAYERS.filter(p => p.category === 'legends');
-      } else if (currentFilter === 'repeats') {
-        list = PLAYERS.filter(p => gameState.repeats && gameState.repeats[p.id] && gameState.repeats[p.id] > 0);
-      }
-
-      list.forEach(p => {
-        const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(p.id) : false;
-        const count = hasIt ? (1 + (gameState.repeats[p.id] || 0)) : 0;
-        
-        const cardContainer = document.createElement('div');
-        cardContainer.className = "w-full flex flex-col";
-        cardContainer.innerHTML = getCardHTML(p, hasIt, count);
-        
-        if (hasIt) {
-          const innerCard = cardContainer.querySelector(`#card-inner-${p.id}`);
-          if (innerCard) {
-            innerCard.addEventListener('click', () => openCardZoom(p.id));
-          }
-        }
-
-        if (currentFilter === 'repeats' && count > 1) {
-          const sellBtn = document.createElement('button');
-          sellBtn.className = "w-full mt-2 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[9px] py-1.5 px-2 rounded-lg tracking-wider transition uppercase";
-          sellBtn.innerText = "Vender por 🪙 15";
-          sellBtn.onclick = (e) => {
-            e.stopPropagation();
-            sellRepeat(p.id);
-          };
-          cardContainer.appendChild(sellBtn);
-        }
-
-        grid.appendChild(cardContainer);
-      });
-
-      if (list.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-gray-500 text-sm font-black uppercase">
-            No tenés ninguna figurita de esta categoría. ¡A por más sobres! ⚽
-          </div>
-        `;
-      }
-    }
-
-    function sellRepeat(id) {
-      if (gameState.repeats[id] && gameState.repeats[id] > 0) {
-        playSound('success');
-        gameState.repeats[id]--;
-        gameState.coins += 15; 
-        saveGame();
-        renderAlbumGrid();
-        showAlert("¡Vendiste una repetida al kiosquero por 🪙 15!", "🪙");
-      }
-    }
-
-    // Zoom en Figurita individual
-    function openCardZoom(id) {
-      playSound('click');
-      const player = PLAYERS.find(p => p.id === id);
-      const hasIt = gameState.collectedIds ? gameState.collectedIds.includes(id) : false;
-      if (!player || !hasIt) return;
-
-      const modal = document.getElementById('card-modal');
-      const placeholder = document.getElementById('modal-card-placeholder');
-      const info = document.getElementById('modal-card-info');
-
-      placeholder.innerHTML = getCardHTML(player, true, 1);
-      
-      let isLegendary = player.legend || player.category === "legends";
-
-      info.innerHTML = `
-        <h3 class="text-xl font-black text-white mt-4 uppercase">${player.name}</h3>
-        <p class="text-xs text-yellow-400 font-extrabold uppercase tracking-widest">${player.category === 'argentina' ? 'Héroe de la Scaloneta 🇦🇷' : (isLegendary ? 'Leyenda del Fútbol Mundial 👑' : 'Crack Internacional ⭐')}</p>
-        <p class="text-sm text-gray-300 mt-2 leading-relaxed">
-          Pisa la cancha con su rol de <strong>${player.pos}</strong> con una media de <strong>${player.ovr}</strong>.
-        </p>
-        <div class="mt-4 bg-emerald-950/40 p-3 rounded-2xl text-xs text-gray-300 border border-emerald-500/15">
-          <div class="grid grid-cols-2 gap-2 text-left font-bold">
-            <div>🏃 Ritmo (PAC): <strong>${player.stats[0]}</strong></div>
-            <div>🎯 Tiro (SHO): <strong>${player.stats[1]}</strong></div>
-            <div>👟 Pase (PAS): <strong>${player.stats[2]}</strong></div>
-            <div>🪄 Regate (DRI): <strong>${player.stats[3]}</strong></div>
-            <div>🛡️ Defensa (DEF): <strong>${player.stats[4]}</strong></div>
-            <div>💪 Físico (PHY): <strong>${player.stats[5]}</strong></div>
-          </div>
-        </div>
-      `;
-
-      modal.classList.remove('hidden');
-    }
-
-    window.closeCardModal = function() {
-      document.getElementById('card-modal').classList.add('hidden');
-    };
-
-    // --- KIOSCO DE SOBRES (TIENDA) ---
-    let pendingPackRewards = [];
-
-    window.resetOpener = function() {
-      document.getElementById('opener-idle').classList.remove('hidden');
-      document.getElementById('opener-opening').classList.add('hidden');
-      document.getElementById('opener-results').classList.add('hidden');
-      pendingPackRewards = [];
-    };
-
-    window.buyPack = function() {
-      playSound('click');
-      if (gameState.coins < 50) {
-        showAlert("¡Che! No te alcanzan las monedas. Hacé los entrenamientos oficiales para jugar más.", "❌");
-        return;
-      }
-
-      gameState.coins -= 50;
-      gameState.openedPacks = (gameState.openedPacks || 0) + 1;
-      saveGame();
-
-      pendingPackRewards = generatePackFiguritas();
-
-      document.getElementById('opener-idle').classList.add('hidden');
-      document.getElementById('opener-opening').classList.remove('hidden');
-      document.getElementById('opener-results').classList.add('hidden');
-
-      document.getElementById('pack-graphic').className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 shake cursor-pointer";
-      document.getElementById('pack-graphic').onclick = performOpenPack;
-    };
-
-    function generatePackFiguritas() {
-      const generated = [];
-      for (let i = 0; i < 5; i++) {
-        const rand = Math.random() * 100;
-        let selectedCategory = "rookies"; 
-
-        if (rand < 7) {
-          selectedCategory = "legends"; 
-        } else if (rand < 27) {
-          selectedCategory = "argentina"; 
-        } else if (rand < 62) {
-          selectedCategory = "stars"; 
-        }
-
-        const possiblePlayers = PLAYERS.filter(p => p.category === selectedCategory);
-        const chosen = possiblePlayers[Math.floor(Math.random() * possiblePlayers.length)];
-        generated.push(chosen);
-      }
-      return generated;
-    }
-
-    function performOpenPack() {
-      playSound('rustle');
-      
-      const graphic = document.getElementById('pack-graphic');
-      graphic.onclick = null; 
-      graphic.className = "w-40 h-52 bg-gradient-to-tr from-yellow-400 via-amber-500 to-red-500 rounded-xl shadow-2xl flex flex-col justify-center items-center border-4 border-yellow-300 transition duration-500 scale-90 opacity-0";
-
-      setTimeout(() => {
-        document.getElementById('opener-opening').classList.add('hidden');
-        document.getElementById('opener-results').classList.remove('hidden');
-
-        const container = document.getElementById('revealed-cards-container');
-        container.innerHTML = "";
-
-        pendingPackRewards.forEach((player, idx) => {
-          const isRepeat = gameState.collectedIds ? gameState.collectedIds.includes(player.id) : false;
-          const hasLegendary = player.legend || player.category === "legends";
-
-          const cardWrapper = document.createElement('div');
-          cardWrapper.className = "w-28 sm:w-32 flex flex-col items-center gap-1.5 transition duration-500 opacity-0 transform translate-y-4";
-          cardWrapper.innerHTML = `
-            ${getCardHTML(player, true, 1)}
-            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isRepeat ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30' : 'bg-emerald-500 text-black'}">
-              ${isRepeat ? '⚡ REPETIDA' : '✨ ¡NUEVA!'}
-            </span>
-          `;
-
-          container.appendChild(cardWrapper);
-
-          const innerCard = cardWrapper.querySelector(`#card-inner-${player.id}`);
-          if (innerCard) {
-            innerCard.addEventListener('click', () => openCardZoom(player.id));
-          }
-
-          setTimeout(() => {
-            cardWrapper.classList.remove('opacity-0', 'translate-y-4');
-            if (hasLegendary) {
-              playSound('shiny');
-            } else {
-              playSound('click');
-            }
-          }, idx * 300);
-        });
-
-      }, 500);
-    }
-
-    window.collectPackResults = function() {
-      playSound('success');
-
-      if (!gameState.collectedIds) gameState.collectedIds = [];
-      if (!gameState.repeats) gameState.repeats = {};
-
-      pendingPackRewards.forEach(player => {
-        if (!gameState.collectedIds.includes(player.id)) {
-          gameState.collectedIds.push(player.id);
-        } else {
-          if (!gameState.repeats[player.id]) {
-            gameState.repeats[player.id] = 0;
-          }
-          gameState.repeats[player.id]++;
-        }
-      });
-
-      gameState.collectedIds.sort((a,b) => a - b);
-      saveGame();
-      resetOpener();
-      showAlert("¡Figuritas pegadas con plasticola en el álbum!", "📖");
-    };
-
-
-    // --- SECCIÓN: TABLA DE POSICIONES (AMIGOS) ---
-    async function loadFriendsLeaderboard() {
-      const tbody = document.getElementById('leaderboard-body');
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center py-8">
-            <div class="animate-spin inline-block w-6 h-6 border-4 border-current border-t-transparent text-emerald-500 rounded-full mb-2"></div>
-            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escaneando el vestuario de los amigos...</p>
-          </td>
-        </tr>
-      `;
-
-      let playersList = [];
-
-      if (isCloudEnabled && db) {
-        try {
-          const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
-          const querySnapshot = await getDocs(colRef);
-          
-          querySnapshot.forEach((doc) => {
-            playersList.push(doc.data());
-          });
-        } catch(e) {
-          console.warn("Fallo cargando multijugador.", e);
-        }
-      }
-
-      if (playersList.length === 0) {
-        playersList.push(gameState);
-        playersList.push({
-          nickname: "Marti_Scaloneta",
-          avatarTeam: "MES",
-          collectedIds: [1, 2, 3, 4, 15, 20, 21, 41, 45],
-          coins: 20,
-          uniquesCount: 9,
-          openedPacks: 3,
-          lastUpdated: new Date().toISOString()
-        });
-        playersList.push({
-          nickname: "Nico_Messi10",
-          avatarTeam: "DIB",
-          collectedIds: [1, 5, 8, 12, 19, 22],
-          coins: 80,
-          uniquesCount: 6,
-          openedPacks: 2,
-          lastUpdated: new Date().toISOString()
-        });
-        playersList.push({
-          nickname: "Sofi_Potrero",
-          avatarTeam: "JUL",
-          collectedIds: [1, 15, 31, 34, 48],
-          coins: 100,
-          uniquesCount: 5,
-          openedPacks: 1,
-          lastUpdated: new Date().toISOString()
-        });
-      }
-
-      playersList.sort((a, b) => {
-        const countA = a.collectedIds ? a.collectedIds.length : 0;
-        const countB = b.collectedIds ? b.collectedIds.length : 0;
-        return countB - countA;
-      });
-
-      tbody.innerHTML = "";
-
-      playersList.forEach((player, idx) => {
-        const uniques = player.collectedIds ? player.collectedIds.length : 0;
-        const percent = Math.round((uniques / 50) * 100);
-        const hero = AVATAR_PLAYERS.find(t => t.code === player.avatarTeam) || AVATAR_PLAYERS[0];
-        const isCurrent = sanitizeNickname(player.nickname) === sanitizeNickname(gameState.nickname);
-
-        const dateStr = player.lastUpdated ? new Date(player.lastUpdated).toLocaleDateString() : "Hoy";
-
-        const tr = document.createElement('tr');
-        tr.className = isCurrent ? "bg-emerald-500/10 border-l-4 border-emerald-500" : "hover:bg-zinc-900/40";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-black">
-            ${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`))}
-          </td>
-          <td class="py-3 px-4 flex items-center gap-2">
-            <span class="text-xl">${hero.emoji}</span>
-            <div>
-              <span class="font-black ${isCurrent ? 'text-emerald-400' : 'text-gray-200'}">${player.nickname}</span>
-              ${isCurrent ? '<span class="text-[9px] bg-emerald-500 text-black px-1.5 py-0.5 rounded ml-1.5 font-bold uppercase tracking-wider">VOS</span>' : ''}
-            </div>
-          </td>
-          <td class="py-3 px-4 text-center">
-            <div class="font-extrabold text-emerald-400">${uniques} / 50</div>
-            <div class="text-[10px] text-gray-400 font-bold uppercase">${percent}% PEGADO</div>
-          </td>
-          <td class="py-3 px-4 text-center text-gray-400">${player.openedPacks || 0}</td>
-          <td class="py-3 px-4 text-center text-yellow-500 font-bold">🪙 ${player.coins}</td>
-          <td class="py-3 px-4 text-right text-xs text-gray-500">${dateStr}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // --- MANEJO DEL MODAL DE CONFIGURACIÓN ---
-    window.openCloudConfigModal = function() {
-      playSound('click');
-      document.getElementById('cloud-config-modal').classList.remove('hidden');
-    };
-    window.closeCloudConfigModal = function() {
-      playSound('click');
-      document.getElementById('cloud-config-modal').classList.add('hidden');
-    };
-
-    // --- AL CARGAR LA PÁGINA ---
-    window.onload = function() {
-      initFirebase();
-    };
-
-  </script>
-
-</body>
-</html>
+      const introDiv = document.getElementById('day
